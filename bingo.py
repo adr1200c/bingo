@@ -13,7 +13,7 @@ def get_base64_image(image_path):
     except Exception:
         return None
 
-st.title("📸 Familie Bingo")
+st.title("📸 Rietman Bingo")
 
 IMAGE_DIR = "familie_fotos"
 
