@@ -2,11 +2,12 @@ import streamlit as st
 import random
 import os
 import base64
+from datetime import date
 
 # 1. Pagina instellingen
 st.set_page_config(page_title="Rietman Familie Bingo", layout="centered")
 
-# 2. Verberg Streamlit rommel (GitHub, Header, Footer)
+# 2. Verberg Streamlit rommel
 hide_style = """
     <style>
     #MainMenu {visibility: hidden;}
@@ -37,9 +38,21 @@ else:
     if len(all_photos) < 9:
         st.warning(f"Voeg minimaal 9 foto's toe.")
     else:
-        # De sessie onthoudt de kaart zolang de gebruiker de pagina open heeft
+        # GEBRUIK EEN VASTE SEED OP BASIS VAN DE DATUM
+        # Hierdoor krijgt iedereen vandaag dezelfde 9 foto's uit de map, 
+        # ook na een refresh.
+        today_seed = date.today().strftime("%Y%m%d")
+        
         if 'my_cards' not in st.session_state:
-            st.session_state.my_cards = random.sample(all_photos, 9)
+            # We zetten de random generator even 'vast' op de datum van vandaag
+            random.seed(today_seed)
+            # Kies 9 foto's (deze 9 zijn voor iedereen vandaag hetzelfde)
+            selected_photos = random.sample(all_photos, 9)
+            # Schud ze daarna voor deze specifieke gebruiker (zodat niet iedereen dezelfde kaart heeft)
+            # We gebruiken hiervoor een unieke sessie-id of gewoon een nieuwe random actie
+            random.seed() # Zet random weer 'vrij'
+            random.shuffle(selected_photos)
+            st.session_state.my_cards = selected_photos
 
         paths = [os.path.join(IMAGE_DIR, name) for name in st.session_state.my_cards]
         b64_list = []
@@ -85,7 +98,7 @@ else:
         </head>
         <body>
             <div id="overlay">
-                <h3 style="color: #333; margin-bottom: 25px;">Welkom bij de Rietman Bingo!</h3>
+                <h3 style="color: #333; margin-bottom: 25px;">Rietman Familie Bingo</h3>
                 <div class="btn-container">
                     <button class="start-btn" onclick="startBingo(true)">Speel met Geluid 🔊</button>
                     <button class="start-btn silent" onclick="startBingo(false)">Stil Spelen 🔇</button>
@@ -97,7 +110,6 @@ else:
                     {"".join([f'<div class="item" onclick="toggle(this, event)"><img src="data:image/jpeg;base64,{b}"><div class="cross"></div></div>' for b in b64_list])}
                 </div>
                 <div class="instruction">
-                    <b>Spelregels:</b> Tik op de foto die wordt getoond!<br>
                     🎁 1 rij = Bingo! | 🏅 2 rijen = Prijs | 🏆 Volle kaart = Hoofdprijs!
                 </div>
             </div>
