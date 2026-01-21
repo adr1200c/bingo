@@ -9,31 +9,33 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 1. CSS met vaste, kleine maten
+# 1. CSS voor compacte foto's ZONDER loze ruimte
 st.markdown("""
     <style>
-    /* Dwing de kolommen om NAAST elkaar te blijven staan met een vaste breedte */
+    /* Dwing de kolommen om strak in het midden naast elkaar te staan */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        justify-content: center !important;
-        gap: 5px !important;
+        justify-content: center !important; /* Zet de 3 foto's in het midden */
+        gap: 8px !important; /* De enige ruimte tussen de foto's */
     }
 
     [data-testid="column"] {
-        width: 100px !important; /* Vaste kleine breedte */
+        width: 100px !important;
         min-width: 100px !important;
-        flex: 0 0 100px !important;
+        flex: 0 0 100px !important; /* Voorkomt dat de kolom groter wordt dan de foto */
+        padding: 0px !important;
+        margin: 0px !important;
     }
 
-    /* De foto's altijd 100x100 pixels */
     .bingo-photo {
         width: 100px !important;
         height: 100px !important;
         object-fit: cover !important;
         border-radius: 8px;
         border: 2px solid #eee;
+        display: block;
     }
 
     .found {
@@ -41,12 +43,12 @@ st.markdown("""
         border: 2px solid #4CAF50 !important;
     }
 
-    /* Knoppen ook op die breedte aanpassen */
     div.stButton > button {
         width: 100px !important;
         font-size: 11px !important;
-        height: 30px !important;
+        height: 28px !important;
         padding: 0px !important;
+        margin-top: 4px !important;
     }
 
     h1 { text-align: center; font-size: 20px !important; }
@@ -69,7 +71,7 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 2. Het Grid bouwen met vaste kolommen
+        # 2. Het Grid bouwen
         for row in range(3):
             cols = st.columns(3)
             for col in range(3):
