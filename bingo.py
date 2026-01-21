@@ -1,59 +1,100 @@
 import streamlit as st
 import random
 import os
+import base64
 
-# Pagina instellingen
-st.set_page_config(page_title="Familie Foto Bingo", layout="wide")
+# 1. Pagina instellingen
+st.set_page_config(page_title="Familie Bingo", layout="centered")
 
-st.title("📸 Onze Familie Foto Bingo")
-st.write("Tik op de foto's die je voorbij hoort komen in het verhaal!")
+# 2. Functie om een foto om te zetten naar een tekst-link (Base64)
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
 
-# Map waar je foto's staan (zorg dat deze in dezelfde map als je script staat)
+# 3. CSS voor het 3x3 grid en de foto-styling
+st.markdown("""
+    <style>
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+    }
+    [data-testid="column"] {
+        width: 33% !important;
+        flex: 1 1 33% !important;
+        min-width: 0px !important;
+    }
+    /* De 'Magie': CSS dwingt de foto in een vierkant */
+    .bingo-photo {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #eeeeee;
+        display: block;
+    }
+    .found {
+        filter: grayscale(100%) opacity(0.3);
+    }
+    .stButton>button {
+        width: 100%;
+        border-radius: 15px;
+        margin-top: 5px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("📸 Familie Bingo")
+
 IMAGE_DIR = "familie_fotos"
 
-# Haal alle bestanden uit de map op
 if not os.path.exists(IMAGE_DIR):
-    st.error(f"Map '{IMAGE_DIR}' niet gevonden. Maak deze map aan en zet je foto's erin.")
+    st.error(f"Map '{IMAGE_DIR}' niet gevonden.")
 else:
-    all_photos = [f for f in os.listdir(IMAGE_DIR) if f.lower().endswith(('png', 'jpg', 'jpeg'))]
+    all_photos = [f for f in os.listdir(IMAGE_DIR) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))]
 
     if len(all_photos) < 9:
-        st.warning("Zorg voor minstens 9 foto's in de map!")
+        st.warning("Voeg meer foto's toe.")
     else:
-        # Kies 9 random foto's en sla ze op in de 'session state' zodat ze niet veranderen bij elke klik
         if 'my_cards' not in st.session_state:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # Maak een 3x3 grid
-        cols = st.columns(3)
+        # 4. Het 3x3 Grid
+        for row in range(3):
+            cols = st.columns(3)
+            for col in range(3):
+                idx = row * 3 + col
+                with cols[col]:
+                    photo_name = st.session_state.my_cards[idx]
+                    is_found = st.session_state.found[idx]
+                    img_path = os.path.join(IMAGE_DIR, photo_name)
+                    
+                    try:
+                        # Zet foto om naar base64 data
+                        img_base64 = get_base64_image(img_path)
+                        img_type = photo_name.split('.')[-1]
+                        
+                        # Toon foto via HTML (omzeilt Streamlit image beperkingen op mobiel)
+                        found_class = "found" if is_found else ""
+                        st.markdown(f"""
+                            <img src="data:image/{img_type};base64,{img_base64}" 
+                                 class="bingo-photo {found_class}">
+                            """, unsafe_allow_html=True)
+                        
+                        label = "✅" if is_found else "Kies"
+                        if st.button(label, key=f"btn_{idx}"):
+                            st.session_state.found[idx] = not st.session_state.found[idx]
+                            st.rerun()
+                    except Exception:
+                        st.write("Fout")
 
-        for i in range(9):
-            with cols[i % 3]:
-                photo_name = st.session_state.my_cards[i]
-                is_found = st.session_state.found[i]
-                
-                # Toon de foto
-                img_path = os.path.join(IMAGE_DIR, photo_name)
-                
-                # Visuele feedback als er geklikt is
-                label = "✅ GEVONDEN" if is_found else "Vink af"
-                
-                if st.button(label, key=f"btn_{i}"):
-                    st.session_state.found[i] = not st.session_state.found[i]
-                    st.rerun()
-                
-                if is_found:
-                    # Grijze/transparante versie als gevonden
-                    st.image(img_path, use_container_width=True, caption=photo_name, channels="RGB")
-                else:
-                    st.image(img_path, use_container_width=True, caption=photo_name)
-
-        # Check voor Bingo
         if all(st.session_state.found):
             st.balloons()
-            st.success("🎉 BINGO! Je hebt de hele kaart vol!")
+            st.success("🎉 BINGO!")
 
-if st.button("Nieuwe kaart genereren"):
-    del st.session_state.my_cards
+st.divider()
+if st.button("🔄 Nieuwe Kaart"):
+    st.session_state.clear()
     st.rerun()
