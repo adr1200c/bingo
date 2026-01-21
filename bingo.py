@@ -8,39 +8,30 @@ st.set_page_config(page_title="Familie Bingo", layout="centered")
 
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
+        with open(image_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
 
-# 2. De "Anti-Stacking" CSS
+# 2. CSS die de tabel en foto's dwingt
 st.markdown("""
     <style>
-    /* Zorg dat de titel niet wordt afgekapt en gecentreerd is */
-    .main h1 {
-        font-size: 22px !important;
-        text-align: center !important;
-        white-space: normal !important;
-        line-height: 1.2 !important;
-    }
-
-    /* Dwing de container op de iPhone naar de volledige breedte */
+    /* Dwing de hele app-container smal te blijven */
     .block-container {
-        padding: 10px !important;
         max-width: 100% !important;
+        padding: 5px !important;
     }
 
-    /* Het Grid: we gebruiken Flexbox met 'nowrap' verbod */
-    .bingo-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-        gap: 6px;
+    /* DE TABEL FIX */
+    .bingo-table {
+        width: 100% !important;
+        table-layout: fixed !important; /* Dwingt gelijke kolommen */
+        border-collapse: collapse !important;
     }
 
-    /* Elk vakje is EXACT 30% van de breedte, zodat er altijd 3 passen */
-    .bingo-box {
-        width: 30% !important;
-        margin-bottom: 10px;
-        display: inline-block;
+    .bingo-cell {
+        width: 33.3% !important;
+        padding: 4px !important;
+        text-align: center;
+        vertical-align: top;
     }
 
     .bingo-photo {
@@ -49,6 +40,7 @@ st.markdown("""
         object-fit: cover !important;
         border-radius: 8px;
         border: 2px solid #eee;
+        display: block;
     }
 
     .found {
@@ -56,20 +48,17 @@ st.markdown("""
         border: 2px solid #4CAF50 !important;
     }
 
-    /* Knoppen fix voor iPhone */
+    /* Maak Streamlit knoppen passend voor de tabel */
     div.stButton > button {
         width: 100% !important;
-        font-size: 12px !important;
-        height: 32px !important;
+        font-size: 11px !important;
+        height: 28px !important;
         padding: 0px !important;
         margin-top: 4px !important;
     }
 
-    /* Verberg de Streamlit kolommen die we als anker gebruiken */
-    [data-testid="column"] {
-        flex: 1 1 30% !important;
-        min-width: 30% !important;
-    }
+    /* Titel fix */
+    h1 { font-size: 20px !important; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -89,29 +78,32 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 3. Het Grid bouwen
-        # We gebruiken st.columns(3), maar de CSS hierboven dwingt ze om klein te blijven
-        for row in range(3):
-            cols = st.columns(3)
-            for col in range(3):
-                idx = row * 3 + col
-                with cols[col]:
+        # 3. De HTML Tabel genereren
+        # We gebruiken st.columns alleen als 'anker' voor de buttons, 
+        # maar de layout wordt bepaald door onze CSS en de HTML structuur.
+        
+        for r in range(3):
+            cols = st.columns(3) # Streamlit maakt de kolommen
+            for c in range(3):
+                idx = r * 3 + c
+                with cols[c]:
+                    # We injecteren de foto via HTML in de kolom
                     photo_name = st.session_state.my_cards[idx]
                     is_found = st.session_state.found[idx]
                     img_path = os.path.join(IMAGE_DIR, photo_name)
                     
                     try:
-                        img_base64 = get_base64_image(img_path)
+                        img_b64 = get_base64_image(img_path)
                         ext = photo_name.split('.')[-1]
                         status_class = "found" if is_found else ""
                         
-                        # We tonen de foto
+                        # De foto tonen
                         st.markdown(f"""
-                            <img src="data:image/{ext};base64,{img_base64}" 
-                                 class="bingo-photo {status_class}">
+                            <img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">
                         """, unsafe_allow_html=True)
                         
-                        # De knop direct eronder
+                        # De button van Streamlit direct eronder
+                        # Omdat de kolom via CSS gedwongen wordt op 33%, MOET de foto krimpen.
                         label = "✅" if is_found else "Kies"
                         if st.button(label, key=f"btn_{idx}"):
                             st.session_state.found[idx] = not st.session_state.found[idx]
