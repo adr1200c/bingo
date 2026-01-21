@@ -9,36 +9,36 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 1. DE "ZERO MARGIN" CSS
+# 1. DE "IPHONE-KILLER" CSS
 st.markdown("""
     <style>
-    /* Verwijder alle standaard Streamlit padding */
+    /* Dwing de container smal */
     .block-container {
         padding: 5px !important;
-        max-width: 360px !important; /* Breedte van een gemiddelde iPhone */
+        max-width: 380px !important;
     }
 
-    /* Dwing de kolommen om ELKE witruimte te negeren */
-    [data-testid="stHorizontalBlock"] {
-        gap: 4px !important; /* De enige ruimte tussen de foto's */
-        display: flex !important;
-        justify-content: center !important;
+    /* We maken een eigen container voor de items */
+    .bingo-grid-container {
+        text-align: center;
+        width: 100%;
+        display: block;
     }
 
-    [data-testid="column"] {
-        padding: 0px !important;
-        margin: 0px !important;
-        flex: 1 1 0% !important; /* Dwingt ze om de ruimte eerlijk te delen zonder marge */
-        min-width: 0px !important;
+    /* Elk item is exact 30% breed en staat naast elkaar */
+    .bingo-item {
+        display: inline-block !important;
+        width: 30% !important;
+        margin: 1%;
+        vertical-align: top;
     }
 
     .bingo-photo {
-        width: 100% !important; /* Vult de volledige kolom */
+        width: 100% !important;
         aspect-ratio: 1 / 1 !important;
         object-fit: cover !important;
-        border-radius: 4px;
+        border-radius: 6px;
         border: 1px solid #ddd;
-        display: block;
     }
 
     .found {
@@ -46,17 +46,21 @@ st.markdown("""
         border: 2px solid #4CAF50 !important;
     }
 
-    /* Knoppen strak onder de foto */
+    /* Verberg de Streamlit kolom-structuur volledig */
+    [data-testid="column"] {
+        display: none !important;
+    }
+
+    /* Maak de knoppen klein genoeg voor in het vakje */
     div.stButton > button {
         width: 100% !important;
-        font-size: 11px !important;
+        font-size: 10px !important;
         height: 26px !important;
         padding: 0px !important;
         margin-top: 2px !important;
-        border-radius: 4px !important;
     }
 
-    h1 { text-align: center; font-size: 18px !important; margin-bottom: 10px !important; }
+    h1 { font-size: 20px !important; text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -76,29 +80,45 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 2. Het Grid (Zonder loze ruimte)
-        for row in range(3):
-            cols = st.columns(3) # De CSS hierboven fixt de marges van deze kolommen
-            for col in range(3):
-                idx = row * 3 + col
-                with cols[col]:
-                    photo_name = st.session_state.my_cards[idx]
-                    is_found = st.session_state.found[idx]
-                    img_path = os.path.join(IMAGE_DIR, photo_name)
+        # 2. HET GRID BOUWEN (Zonder st.columns)
+        # We gebruiken één grote div en zetten daar alles in
+        
+        # We gebruiken een trucje: we renderen de foto's en knoppen in een grid
+        # door ze handmatig in een loop te zetten zonder Streamlit kolommen.
+        
+        for i in range(9):
+            # We openen een 'vakje'
+            with st.container():
+                # Dit is de 'hack': we gebruiken markdown voor de foto 
+                # en een gewone button voor de actie, maar de CSS dwingt ze naast elkaar.
+                
+                photo_name = st.session_state.my_cards[i]
+                is_found = st.session_state.found[i]
+                img_path = os.path.join(IMAGE_DIR, photo_name)
+                
+                try:
+                    img_b64 = get_base64_image(img_path)
+                    ext = photo_name.split('.')[-1]
+                    status_class = "found" if is_found else ""
                     
-                    try:
-                        img_b64 = get_base64_image(img_path)
-                        ext = photo_name.split('.')[-1]
-                        status_class = "found" if is_found else ""
-                        
-                        st.markdown(f'''<img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">''', unsafe_allow_html=True)
-                        
-                        label = "✅" if is_found else "Kies"
-                        if st.button(label, key=f"btn_{idx}"):
-                            st.session_state.found[idx] = not st.session_state.found[idx]
-                            st.rerun()
-                    except:
-                        st.write("!")
+                    # We maken een div die Streamlit's stacking negeert
+                    st.markdown(f'''
+                        <div style="float: left; width: 31%; margin: 1%;">
+                            <img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">
+                    ''', unsafe_allow_html=True)
+                    
+                    # De knop
+                    label = "✅" if is_found else "Kies"
+                    if st.button(label, key=f"btn_{i}"):
+                        st.session_state.found[i] = not st.session_state.found[i]
+                        st.rerun()
+                    
+                    st.markdown('</div>', unsafe_allow_html=True)
+                except:
+                    st.write("!")
+
+        # Clear fix om de floats te stoppen
+        st.markdown('<div style="clear: both;"></div>', unsafe_allow_html=True)
 
         if all(st.session_state.found):
             st.balloons()
