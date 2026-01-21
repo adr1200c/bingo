@@ -26,6 +26,10 @@ else:
 
         b64_list = [get_base64_image(os.path.join(IMAGE_DIR, name)) for name in st.session_state.my_cards]
 
+        # DIT IS EEN BASE64 ENCODED 'POP' GELUID. Geen externe link nodig.
+        # Safari accepteert dit omdat het geluid 'ingebouwd' is.
+        audio_b64 = "UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAADpAOoA" # Dit is een placeholder
+
         html_code = f"""
         <html>
         <head>
@@ -33,7 +37,6 @@ else:
             <style>
                 body {{ margin: 0; background: transparent; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }}
                 
-                /* Startscherm Overlay */
                 #overlay {{
                     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                     background: white; z-index: 100; display: flex; flex-direction: column;
@@ -41,17 +44,14 @@ else:
                 }}
                 .start-btn {{
                     padding: 20px 40px; font-size: 24px; cursor: pointer;
-                    background-color: #28a745; color: white; border: none;
+                    background-color: #E91E63; color: white; border: none;
                     border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                    transition: transform 0.2s;
                 }}
-                .start-btn:active {{ transform: scale(0.95); }}
 
-                /* Bingo Grid */
                 .grid {{
                     display: grid; grid-template-columns: repeat(3, 1fr);
                     gap: 8px; width: 98vw; max-width: 400px; padding: 5px;
-                    display: none; /* Verberg grid tot start */
+                    display: none;
                 }}
                 .item {{
                     position: relative; aspect-ratio: 1 / 1; border-radius: 12px;
@@ -76,53 +76,65 @@ else:
         </head>
         <body>
             <div id="overlay">
-                <button class="start-btn" onclick="activateAudio()">▶ Start Bingo (met geluid)</button>
-                <p style="margin-top: 15px; color: #666;">Tik om de kaart te laden</p>
+                <button class="start-btn" onclick="startBingo()">Start Bingo 🔊</button>
+                <p style="margin-top: 15px; color: #666;">Activeer geluid & kaart</p>
             </div>
 
             <div class="grid" id="bingoGrid">
                 {"".join([f'<div class="item" onclick="toggle(this, event)"><img src="data:image/jpeg;base64,{b}"><div class="cross"></div></div>' for b in b64_list])}
             </div>
 
-            <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
-
             <script>
-                const sound = document.getElementById('click-sound');
-                const overlay = document.getElementById('overlay');
-                const grid = document.getElementById('bingoGrid');
+                // We maken een synthetisch geluid (Beep) met de Web Audio API. 
+                // Dit heeft GEEN bestand nodig en Safari staat dit ALTIJD toe na een klik.
+                let audioCtx = null;
 
-                function activateAudio() {{
-                    // Safari Unlock: Speel af en pauzeer direct
-                    sound.play().then(() => {{
-                        sound.pause();
-                        sound.currentTime = 0;
-                        // Verberg overlay en toon grid
-                        overlay.style.display = 'none';
-                        grid.style.display = 'grid';
-                    }}).catch(e => {{
-                        console.error("Audio error:", e);
-                        overlay.style.display = 'none';
-                        grid.style.display = 'grid';
-                    }});
+                function startBingo() {{
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    // 'Stille' noot om de audio te activeren
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    gain.gain.value = 0.001; 
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+
+                    document.getElementById('overlay').style.display = 'none';
+                    document.getElementById('bingoGrid').style.display = 'grid';
+                }}
+
+                function playPopSound() {{
+                    if (!audioCtx) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+                    
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
                 }}
 
                 function toggle(el, event) {{
                     const isSelecting = !el.classList.contains('selected');
                     el.classList.toggle('selected');
                     
-                    // Speel geluid
-                    sound.currentTime = 0;
-                    sound.play();
-
-                    // Confetti bij elke klik
                     if (isSelecting) {{
+                        playPopSound();
                         confetti({{
                             particleCount: 30, spread: 50,
                             origin: {{ x: event.clientX / window.innerWidth, y: event.clientY / window.innerHeight }}
                         }});
                     }}
 
-                    // Check Bingo
                     const totalSelected = document.querySelectorAll('.selected').length;
                     if (totalSelected === 9) {{
                         var duration = 4 * 1000;
