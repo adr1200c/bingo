@@ -3,64 +3,52 @@ import random
 import os
 import base64
 
+# 1. Pagina instellingen
 st.set_page_config(page_title="Familie Bingo", layout="centered")
 
 def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 1. DE "IPHONE-KILLER" CSS
+# 2. De "Onbreekbare" CSS
 st.markdown("""
     <style>
-    /* Dwing de container smal */
-    .block-container {
-        padding: 5px !important;
-        max-width: 380px !important;
+    .block-container { padding: 10px !important; max-width: 400px !important; }
+    
+    /* Het Grid: forceert 3 kolommen, zelfs op de kleinste schermen */
+    .bingo-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+        width: 100% !important;
     }
 
-    /* We maken een eigen container voor de items */
-    .bingo-grid-container {
-        text-align: center;
-        width: 100%;
-        display: block;
-    }
-
-    /* Elk item is exact 30% breed en staat naast elkaar */
+    /* Het klikbare vakje */
     .bingo-item {
-        display: inline-block !important;
-        width: 30% !important;
-        margin: 1%;
-        vertical-align: top;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        position: relative;
+        cursor: pointer;
     }
 
     .bingo-photo {
-        width: 100% !important;
-        aspect-ratio: 1 / 1 !important;
-        object-fit: cover !important;
-        border-radius: 6px;
-        border: 1px solid #ddd;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #eee;
+        display: block;
     }
 
     .found {
         filter: grayscale(100%) opacity(0.3);
-        border: 2px solid #4CAF50 !important;
+        border: 3px solid #4CAF50 !important;
     }
 
-    /* Verberg de Streamlit kolom-structuur volledig */
-    [data-testid="column"] {
-        display: none !important;
-    }
-
-    /* Maak de knoppen klein genoeg voor in het vakje */
-    div.stButton > button {
-        width: 100% !important;
-        font-size: 10px !important;
-        height: 26px !important;
-        padding: 0px !important;
-        margin-top: 2px !important;
-    }
-
-    h1 { font-size: 20px !important; text-align: center; }
+    /* Verberg de standaard knoppen die we nu niet meer nodig hebben voor het grid */
+    .stButton button { width: 100%; }
+    
+    h1 { text-align: center; font-size: 20px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -80,45 +68,45 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 2. HET GRID BOUWEN (Zonder st.columns)
-        # We gebruiken één grote div en zetten daar alles in
-        
-        # We gebruiken een trucje: we renderen de foto's en knoppen in een grid
-        # door ze handmatig in een loop te zetten zonder Streamlit kolommen.
+        # 3. Bouw het grid in één HTML blok
+        # We maken een grote string met alle HTML
+        grid_html = '<div class="bingo-grid">'
         
         for i in range(9):
-            # We openen een 'vakje'
-            with st.container():
-                # Dit is de 'hack': we gebruiken markdown voor de foto 
-                # en een gewone button voor de actie, maar de CSS dwingt ze naast elkaar.
+            photo_name = st.session_state.my_cards[i]
+            is_found = st.session_state.found[i]
+            img_path = os.path.join(IMAGE_DIR, photo_name)
+            
+            try:
+                img_b64 = get_base64_image(img_path)
+                ext = photo_name.split('.')[-1]
+                status_class = "found" if is_found else ""
                 
-                photo_name = st.session_state.my_cards[i]
-                is_found = st.session_state.found[i]
-                img_path = os.path.join(IMAGE_DIR, photo_name)
-                
-                try:
-                    img_b64 = get_base64_image(img_path)
-                    ext = photo_name.split('.')[-1]
-                    status_class = "found" if is_found else ""
-                    
-                    # We maken een div die Streamlit's stacking negeert
-                    st.markdown(f'''
-                        <div style="float: left; width: 31%; margin: 1%;">
-                            <img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">
-                    ''', unsafe_allow_html=True)
-                    
-                    # De knop
-                    label = "✅" if is_found else "Kies"
-                    if st.button(label, key=f"btn_{i}"):
-                        st.session_state.found[i] = not st.session_state.found[i]
-                        st.rerun()
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
-                except:
-                    st.write("!")
+                # Elke foto wordt een link die een 'trigger' verstuurt naar Streamlit
+                grid_html += f'''
+                    <div class="bingo-item">
+                        <img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">
+                    </div>
+                '''
+            except:
+                grid_html += '<div class="bingo-item" style="background:#eee;">err</div>'
+        
+        grid_html += '</div>'
+        
+        # Toon de volledige tabel
+        st.markdown(grid_html, unsafe_allow_html=True)
 
-        # Clear fix om de floats te stoppen
-        st.markdown('<div style="clear: both;"></div>', unsafe_allow_html=True)
+        # Omdat we in pure HTML geen klik-events naar Python kunnen sturen zonder 
+        # ingewikkelde componenten, gebruiken we hieronder simpele knoppen 
+        # om de status per nummer bij te werken.
+        st.write("Tik op het nummer om af te strepen:")
+        cols = st.columns(9)
+        for i in range(9):
+            with cols[i]:
+                label = "✅" if st.session_state.found[i] else str(i+1)
+                if st.button(label, key=f"check_{i}"):
+                    st.session_state.found[i] = not st.session_state.found[i]
+                    st.rerun()
 
         if all(st.session_state.found):
             st.balloons()
