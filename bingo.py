@@ -6,30 +6,41 @@ import base64
 # 1. Pagina instellingen
 st.set_page_config(page_title="Familie Bingo", layout="centered")
 
-# 2. Functie voor Base64 afbeeldingen
 def get_base64_image(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
 
-# 3. CSS om de tabel en knoppen te temmen
+# 2. De "Anti-Stacking" CSS
 st.markdown("""
     <style>
+    /* Zorg dat de titel niet wordt afgekapt en gecentreerd is */
+    .main h1 {
+        font-size: 22px !important;
+        text-align: center !important;
+        white-space: normal !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Dwing de container op de iPhone naar de volledige breedte */
     .block-container {
         padding: 10px !important;
-        max-width: 500px !important;
+        max-width: 100% !important;
     }
-    
-    /* De Tabel Forceer-methode */
-    table {
-        width: 100% !important;
-        border-collapse: collapse;
-        table-layout: fixed; /* Dwingt gelijke kolommen */
+
+    /* Het Grid: we gebruiken Flexbox met 'nowrap' verbod */
+    .bingo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        gap: 6px;
     }
-    
-    td {
-        padding: 4px !important;
-        vertical-align: top;
-        width: 33.33%;
+
+    /* Elk vakje is EXACT 30% van de breedte, zodat er altijd 3 passen */
+    .bingo-box {
+        width: 30% !important;
+        margin-bottom: 10px;
+        display: inline-block;
     }
 
     .bingo-photo {
@@ -37,24 +48,28 @@ st.markdown("""
         aspect-ratio: 1 / 1 !important;
         object-fit: cover !important;
         border-radius: 8px;
-        border: 1px solid #ddd;
+        border: 2px solid #eee;
     }
 
     .found {
         filter: grayscale(100%) opacity(0.3);
-        border: 3px solid #4CAF50 !important;
+        border: 2px solid #4CAF50 !important;
     }
 
-    /* Streamlit knoppen binnen de tabelcellen */
+    /* Knoppen fix voor iPhone */
     div.stButton > button {
         width: 100% !important;
-        height: 30px !important;
-        font-size: 10px !important;
+        font-size: 12px !important;
+        height: 32px !important;
         padding: 0px !important;
-        margin-top: 2px !important;
+        margin-top: 4px !important;
     }
-    
-    h1 { text-align: center; font-size: 22px !important; }
+
+    /* Verberg de Streamlit kolommen die we als anker gebruiken */
+    [data-testid="column"] {
+        flex: 1 1 30% !important;
+        min-width: 30% !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -74,14 +89,10 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 4. Het Grid bouwen met een HTML Tabel
-        # We openen de tabel
-        st.write('<table>', unsafe_allow_html=True)
-        
+        # 3. Het Grid bouwen
+        # We gebruiken st.columns(3), maar de CSS hierboven dwingt ze om klein te blijven
         for row in range(3):
-            cols = st.columns(3) # We gebruiken de kolommen alleen als anker voor de knoppen
-            
-            # We maken handmatig de rijen in de tabel
+            cols = st.columns(3)
             for col in range(3):
                 idx = row * 3 + col
                 with cols[col]:
@@ -94,21 +105,19 @@ else:
                         ext = photo_name.split('.')[-1]
                         status_class = "found" if is_found else ""
                         
-                        # Toon de foto in de cel
+                        # We tonen de foto
                         st.markdown(f"""
                             <img src="data:image/{ext};base64,{img_base64}" 
                                  class="bingo-photo {status_class}">
                         """, unsafe_allow_html=True)
                         
-                        # De knop
+                        # De knop direct eronder
                         label = "✅" if is_found else "Kies"
                         if st.button(label, key=f"btn_{idx}"):
                             st.session_state.found[idx] = not st.session_state.found[idx]
                             st.rerun()
                     except:
                         st.write("!")
-        
-        st.write('</table>', unsafe_allow_html=True)
 
         if all(st.session_state.found):
             st.balloons()
