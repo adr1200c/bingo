@@ -72,7 +72,7 @@ else:
                 .cross::after {{ transform: translateY(-50%) rotate(-45deg); }}
                 .selected .cross {{ display: block; }}
                 .selected img {{ filter: grayscale(100%) brightness(0.5); }}
-                .instruction {{ color: #444; font-style: italic; font-size: 16px; text-align: center; background: #eee; padding: 10px; border-radius: 10px; }}
+                .instruction {{ color: #444; font-style: italic; font-size: 14px; text-align: center; background: #eee; padding: 10px; border-radius: 10px; line-height: 1.4; }}
             </style>
         </head>
         <body>
@@ -88,7 +88,10 @@ else:
                 <div class="grid" id="bingoGrid">
                     {"".join([f'<div class="item" data-index="{i}" onclick="toggle(this, event)"><img src="data:image/jpeg;base64,{b}"><div class="cross"></div></div>' for i, b in enumerate(b64_list)])}
                 </div>
-                <div class="instruction">💡 Klik op de foto uit het Rietman verhaal!<br><b>3 op een rij = Bingo! | 9 foto's = Hoofdprijs!</b></div>
+                <div class="instruction">
+                    <b>Prijzen:</b> 1 rij (Bingo!) | 2 rijen | 9 foto's (Hoofdprijs!)<br>
+                    <i>Klik op de foto als je deze in het verhaal ziet.</i>
+                </div>
             </div>
 
             <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
@@ -98,8 +101,7 @@ else:
                 const clickSnd = document.getElementById('clickSound');
                 const winSnd = document.getElementById('winSound');
                 let soundEnabled = true;
-                let win3Reached = false;
-                let win9Reached = false;
+                let winCount = 0; // Houdt bij hoeveel prijsmomenten zijn bereikt
 
                 function startBingo(s) {{
                     soundEnabled = s;
@@ -108,13 +110,20 @@ else:
                     document.getElementById('game-container').style.display = 'flex';
                 }}
 
-                function check3InARow() {{
+                function countFullLines() {{
                     const items = document.querySelectorAll('.item');
                     const selected = Array.from(items).map(el => el.classList.contains('selected'));
                     const winPatterns = [
-                        [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]
+                        [0,1,2], [3,4,5], [6,7,8], // Horizontaal
+                        [0,3,6], [1,4,7], [2,5,8], // Verticaal
+                        [0,4,8], [2,4,6]           // Diagonaal
                     ];
-                    return winPatterns.some(pattern => pattern.every(index => selected[index]));
+                    
+                    let lines = 0;
+                    winPatterns.forEach(pattern => {{
+                        if(pattern.every(index => selected[index])) lines++;
+                    }});
+                    return lines;
                 }}
 
                 function toggle(el, ev) {{
@@ -126,31 +135,38 @@ else:
                         confetti({{ particleCount: 20, origin: {{ x: ev.clientX/window.innerWidth, y: ev.clientY/window.innerHeight }} }});
                     }}
 
+                    const fullLines = countFullLines();
                     const selectedCount = document.querySelectorAll('.selected').length;
 
-                    // Check voor 3 op een rij (Eerste prijs)
-                    if(!win3Reached && check3InARow()) {{
-                        win3Reached = true;
-                        if(soundEnabled) winSnd.play();
-                        confetti({{ particleCount: 100, spread: 70, origin: {{ y: 0.6 }}, colors: ['#42a5f5', '#ffffff'] }});
-                        setTimeout(() => alert("BINGO! Je hebt 3 op een rij! Speel door voor de hoofdprijs (9 foto's)!"), 500);
+                    // 1. Eerste rij Bingo
+                    if(winCount === 0 && fullLines >= 1) {{
+                        winCount = 1;
+                        triggerWin("BINGO! Je hebt 1 rij vol! 🎁", 80);
+                    }} 
+                    // 2. Tweede rij Bingo
+                    else if(winCount === 1 && fullLines >= 2) {{
+                        winCount = 2;
+                        triggerWin("SUPER! Je hebt al 2 rijen vol! 🎖️", 120);
                     }}
-
-                    // Check voor alle 9 (Hoofdprijs)
-                    if(!win9Reached && selectedCount === 9) {{
-                        win9Reached = true;
+                    // 3. Hoofdprijs (alle 9)
+                    else if(winCount === 2 && selectedCount === 9) {{
+                        winCount = 3;
                         if(soundEnabled) winSnd.play();
                         
-                        // Extra grote confetti regen
-                        var end = Date.now() + (5 * 1000);
+                        var end = Date.now() + (6 * 1000);
                         (function frame() {{
-                            confetti({{ particleCount: 7, angle: 60, spread: 55, origin: {{ x: 0 }}, colors: ['#ff0000', '#ffd700'] }});
-                            confetti({{ particleCount: 7, angle: 120, spread: 55, origin: {{ x: 1 }}, colors: ['#ff0000', '#ffd700'] }});
+                            confetti({{ particleCount: 8, angle: 60, spread: 55, origin: {{ x: 0 }}, colors: ['#ff0000', '#ffd700'] }});
+                            confetti({{ particleCount: 8, angle: 120, spread: 55, origin: {{ x: 1 }}, colors: ['#ff0000', '#ffd700'] }});
                             if (Date.now() < end) {{ requestAnimationFrame(frame); }}
                         }}());
-                        
-                        setTimeout(() => alert("HOOFDPRIJS!!! Je hebt de hele kaart vol! 🏆"), 1000);
+                        setTimeout(() => alert("HOOFDPRIJS!!! De hele kaart is vol! 🏆👑"), 1000);
                     }}
+                }}
+
+                function triggerWin(msg, count) {{
+                    if(soundEnabled) winSnd.play();
+                    confetti({{ particleCount: count, spread: 70, origin: {{ y: 0.6 }} }});
+                    setTimeout(() => alert(msg), 500);
                 }}
             </script>
         </body>
@@ -159,6 +175,6 @@ else:
         st.components.v1.html(html_code, height=650)
 
 st.divider()
-if st.button("🔄 Nieuwe kaart genereren"):
+if st.button("🔄 Andere foto's (Nieuwe kaart)"):
     st.session_state.pop("my_cards", None)
     st.rerun()
