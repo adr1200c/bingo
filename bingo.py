@@ -12,6 +12,10 @@ def get_base64_image(image_path):
 
 st.title("📸 Familie Bingo")
 
+# Initialiseer de status voor de ballonnen
+if "show_balloons" not in st.session_state:
+    st.session_state.show_balloons = False
+
 IMAGE_DIR = "familie_fotos"
 
 if not os.path.exists(IMAGE_DIR):
@@ -27,11 +31,10 @@ else:
 
         b64_list = [get_base64_image(os.path.join(IMAGE_DIR, name)) for name in st.session_state.my_cards]
 
-        # De meest stabiele HTML/JS versie zonder extra knoppen
+        # De HTML/JS met geluid en postMessage voor Streamlit ballonnen
         html_code = f"""
         <html>
         <head>
-            <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
             <style>
                 body {{ margin: 0; background: transparent; overflow: hidden; display: flex; justify-content: center; }}
                 .grid {{
@@ -82,29 +85,63 @@ else:
         </head>
         <body>
             <div class="grid">
-                {"".join([f'<div class="item" onclick="toggle(this)"><img src="data:image/jpeg;base64,{b64}"><div class="cross"></div></div>' for b64 in b64_list])}
+                {"".join([f'<div class="item" onclick="toggle(this, {i})"><img src="data:image/jpeg;base64,{b64}"><div class="cross"></div></div>' for i, b64 in enumerate(b64_list)])}
             </div>
 
+            <audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-37.mp3" preload="auto"></audio>
+
             <script>
-                function toggle(el) {{
+                const sound = document.getElementById('click-sound');
+                let audioUnlocked = false;
+                let selectedItems = Array(9).fill(false); // Houd de status lokaal bij
+
+                function toggle(el, index) {{
+                    // De "Safari Unlock" truc voor audio
+                    if (!audioUnlocked) {{
+                        sound.play().then(() => {{
+                            sound.pause();
+                            sound.currentTime = 0;
+                            audioUnlocked = true;
+                        }}).catch(e => console.log("Audio awaiting user interaction..."));
+                    }}
+
                     el.classList.toggle('selected');
-                    const totalSelected = document.querySelectorAll('.selected').length;
+                    selectedItems[index] = el.classList.contains('selected');
+                    
+                    if (audioUnlocked) {{
+                        sound.currentTime = 0;
+                        sound.play();
+                    }}
+
+                    const totalSelected = selectedItems.filter(Boolean).length;
                     if (totalSelected === 9) {{
-                        confetti({{
-                            particleCount: 150,
-                            spread: 70,
-                            origin: {{ y: 0.6 }}
-                        }});
+                        // Stuur signaal naar Streamlit voor ballonnen
+                        window.parent.postMessage({{ type: 'streamlit:setComponentValue', value: 'BINGO_WIN' }}, '*');
+                    }} else {{
+                        // Zorg dat Streamlit geen valse Bingo-melding krijgt als niet alles vol is
+                        window.parent.postMessage({{ type: 'streamlit:setComponentValue', value: 'NOT_BINGO' }}, '*');
                     }}
                 }}
             </script>
         </body>
         </html>
         """
-
-        st.components.v1.html(html_code, height=450)
+        # Render het Iframe en vang het signaal voor de ballonnen op
+        # De hoogte is aangepast voor een strakker grid
+        streamlit_message = st.components.v1.html(html_code, height=450)
+        
+        # Alleen ballonnen als de specifieke boodschap 'BINGO_WIN' binnenkomt
+        if streamlit_message == "BINGO_WIN":
+            st.balloons()
+            st.success("🎉 BINGO! De hele kaart is vol!")
+            # Reset de status zodat de ballonnen niet blijven komen bij reruns
+            st.session_state.show_balloons = False 
+        elif streamlit_message == "NOT_BINGO":
+            # Dit voorkomt dat ballonnen verschijnen als de pagina opnieuw laadt 
+            # en de status van de selectie nog niet volledig is
+            st.session_state.show_balloons = False
 
 st.divider()
 if st.button("🔄 Nieuwe Kaart"):
     st.session_state.clear()
-    st.rerun()
+    st.rerun() # Herlaad de hele app om een nieuwe kaart te genereren
