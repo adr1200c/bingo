@@ -26,6 +26,9 @@ else:
 
         b64_list = [get_base64_image(os.path.join(IMAGE_DIR, name)) for name in st.session_state.my_cards]
 
+        # Dit is een kort 'pop' geluidje in Base64 (geen externe link nodig!)
+        pop_sound_b64 = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAADpAOoA"
+
         html_code = f"""
         <html>
         <head>
@@ -62,42 +65,51 @@ else:
                 {"".join([f'<div class="item" onclick="toggle(this, event)"><img src="data:image/jpeg;base64,{b}"><div class="cross"></div></div>' for b in b64_list])}
             </div>
 
-            <audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-37.mp3" preload="auto"></audio>
+            <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
 
             <script>
                 const sound = document.getElementById('click-sound');
                 let audioUnlocked = false;
 
                 function toggle(el, event) {{
-                    // Unlock audio voor Safari
+                    // Safari Unlock bij de EERSTE klik
                     if (!audioUnlocked) {{
-                        sound.play().then(() => {{ sound.pause(); sound.currentTime = 0; audioUnlocked = true; }});
+                        sound.play().then(() => {{
+                            sound.pause();
+                            sound.currentTime = 0;
+                            audioUnlocked = true;
+                            // Na unlocken direct spelen voor de huidige klik
+                            playSfx();
+                        }}).catch(e => {{
+                            console.log("Wachten op interactie...");
+                        }});
+                    }} else {{
+                        playSfx();
+                    }}
+
+                    function playSfx() {{
+                        sound.currentTime = 0;
+                        sound.play();
                     }}
 
                     const isSelecting = !el.classList.contains('selected');
                     el.classList.toggle('selected');
                     
-                    if (audioUnlocked) {{ sound.currentTime = 0; sound.play(); }}
-
-                    // Confetti effect op de plek van de klik!
                     if (isSelecting) {{
                         confetti({{
-                            particleCount: 40,
+                            particleCount: 30,
                             spread: 50,
                             origin: {{ x: event.clientX / window.innerWidth, y: event.clientY / window.innerHeight }}
                         }});
                     }}
 
-                    // Check voor de Grote Bingo
                     const totalSelected = document.querySelectorAll('.selected').length;
                     if (totalSelected === 9) {{
-                        // Een enorme regen van confetti
-                        var duration = 3 * 1000;
+                        var duration = 4 * 1000;
                         var end = Date.now() + duration;
-
                         (function frame() {{
-                          confetti({{ particleCount: 5, angle: 60, spread: 55, origin: {{ x: 0 }} }});
-                          confetti({{ particleCount: 5, angle: 120, spread: 55, origin: {{ x: 1 }} }});
+                          confetti({{ particleCount: 7, angle: 60, spread: 55, origin: {{ x: 0 }} }});
+                          confetti({{ particleCount: 7, angle: 120, spread: 55, origin: {{ x: 1 }} }});
                           if (Date.now() < end) {{ requestAnimationFrame(frame); }}
                         }}());
                     }}
