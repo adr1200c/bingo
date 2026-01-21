@@ -9,33 +9,28 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 1. CSS die het "springen" naar grote foto's verbiedt
+# 1. CSS met vaste, kleine maten
 st.markdown("""
     <style>
-    /* Forceer de hoofdcontainer om smal te blijven en niet te verspringen */
-    .block-container {
-        max-width: 400px !important;
-        padding: 5px !important;
+    /* Dwing de kolommen om NAAST elkaar te blijven staan met een vaste breedte */
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: center !important;
+        gap: 5px !important;
     }
 
-    /* HET ONBREEKBARE GRID */
-    .bingo-grid {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important; /* ALTIJD 3 kolommen */
-        gap: 8px !important;
-        width: 100% !important;
+    [data-testid="column"] {
+        width: 100px !important; /* Vaste kleine breedte */
+        min-width: 100px !important;
+        flex: 0 0 100px !important;
     }
 
-    .bingo-cell {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-
+    /* De foto's altijd 100x100 pixels */
     .bingo-photo {
-        width: 100% !important;
-        aspect-ratio: 1 / 1 !important;
+        width: 100px !important;
+        height: 100px !important;
         object-fit: cover !important;
         border-radius: 8px;
         border: 2px solid #eee;
@@ -46,19 +41,15 @@ st.markdown("""
         border: 2px solid #4CAF50 !important;
     }
 
-    /* Dwing Streamlit kolommen (als ze toch laden) om klein te blijven */
-    [data-testid="column"] {
-        width: 33% !important;
-        flex: 0 0 33% !important;
-        min-width: 33% !important;
-    }
-    
-    [data-testid="stHorizontalBlock"] {
-        flex-wrap: nowrap !important; /* Verbiedt het onder elkaar klappen */
+    /* Knoppen ook op die breedte aanpassen */
+    div.stButton > button {
+        width: 100px !important;
+        font-size: 11px !important;
+        height: 30px !important;
+        padding: 0px !important;
     }
 
-    /* Titel fix */
-    h1 { font-size: 20px !important; text-align: center; }
+    h1 { text-align: center; font-size: 20px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -78,10 +69,8 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 2. De Bingo Kaart bouwen
-        # We gebruiken GEEN st.columns(3) direct in een loop, maar dwingen de structuur
+        # 2. Het Grid bouwen met vaste kolommen
         for row in range(3):
-            # De 'nowrap' in de CSS zorgt dat deze 3 kolommen naast elkaar BLIJVEN
             cols = st.columns(3)
             for col in range(3):
                 idx = row * 3 + col
@@ -95,10 +84,8 @@ else:
                         ext = photo_name.split('.')[-1]
                         status_class = "found" if is_found else ""
                         
-                        # Toon foto
                         st.markdown(f'''<img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">''', unsafe_allow_html=True)
                         
-                        # Toon knop
                         label = "✅" if is_found else "Kies"
                         if st.button(label, key=f"btn_{idx}"):
                             st.session_state.found[idx] = not st.session_state.found[idx]
