@@ -26,18 +26,32 @@ else:
 
         b64_list = [get_base64_image(os.path.join(IMAGE_DIR, name)) for name in st.session_state.my_cards]
 
-        # Dit is een kort 'pop' geluidje in Base64 (geen externe link nodig!)
-        pop_sound_b64 = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAADpAOoA"
-
         html_code = f"""
         <html>
         <head>
             <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
             <style>
-                body {{ margin: 0; background: transparent; overflow: hidden; display: flex; justify-content: center; }}
+                body {{ margin: 0; background: transparent; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }}
+                
+                /* Startscherm Overlay */
+                #overlay {{
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: white; z-index: 100; display: flex; flex-direction: column;
+                    justify-content: center; align-items: center;
+                }}
+                .start-btn {{
+                    padding: 20px 40px; font-size: 24px; cursor: pointer;
+                    background-color: #28a745; color: white; border: none;
+                    border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    transition: transform 0.2s;
+                }}
+                .start-btn:active {{ transform: scale(0.95); }}
+
+                /* Bingo Grid */
                 .grid {{
                     display: grid; grid-template-columns: repeat(3, 1fr);
                     gap: 8px; width: 98vw; max-width: 400px; padding: 5px;
+                    display: none; /* Verberg grid tot start */
                 }}
                 .item {{
                     position: relative; aspect-ratio: 1 / 1; border-radius: 12px;
@@ -61,7 +75,12 @@ else:
             </style>
         </head>
         <body>
-            <div class="grid">
+            <div id="overlay">
+                <button class="start-btn" onclick="activateAudio()">▶ Start Bingo (met geluid)</button>
+                <p style="margin-top: 15px; color: #666;">Tik om de kaart te laden</p>
+            </div>
+
+            <div class="grid" id="bingoGrid">
                 {"".join([f'<div class="item" onclick="toggle(this, event)"><img src="data:image/jpeg;base64,{b}"><div class="cross"></div></div>' for b in b64_list])}
             </div>
 
@@ -69,40 +88,41 @@ else:
 
             <script>
                 const sound = document.getElementById('click-sound');
-                let audioUnlocked = false;
+                const overlay = document.getElementById('overlay');
+                const grid = document.getElementById('bingoGrid');
+
+                function activateAudio() {{
+                    // Safari Unlock: Speel af en pauzeer direct
+                    sound.play().then(() => {{
+                        sound.pause();
+                        sound.currentTime = 0;
+                        // Verberg overlay en toon grid
+                        overlay.style.display = 'none';
+                        grid.style.display = 'grid';
+                    }}).catch(e => {{
+                        console.error("Audio error:", e);
+                        overlay.style.display = 'none';
+                        grid.style.display = 'grid';
+                    }});
+                }}
 
                 function toggle(el, event) {{
-                    // Safari Unlock bij de EERSTE klik
-                    if (!audioUnlocked) {{
-                        sound.play().then(() => {{
-                            sound.pause();
-                            sound.currentTime = 0;
-                            audioUnlocked = true;
-                            // Na unlocken direct spelen voor de huidige klik
-                            playSfx();
-                        }}).catch(e => {{
-                            console.log("Wachten op interactie...");
-                        }});
-                    }} else {{
-                        playSfx();
-                    }}
-
-                    function playSfx() {{
-                        sound.currentTime = 0;
-                        sound.play();
-                    }}
-
                     const isSelecting = !el.classList.contains('selected');
                     el.classList.toggle('selected');
                     
+                    // Speel geluid
+                    sound.currentTime = 0;
+                    sound.play();
+
+                    // Confetti bij elke klik
                     if (isSelecting) {{
                         confetti({{
-                            particleCount: 30,
-                            spread: 50,
+                            particleCount: 30, spread: 50,
                             origin: {{ x: event.clientX / window.innerWidth, y: event.clientY / window.innerHeight }}
                         }});
                     }}
 
+                    // Check Bingo
                     const totalSelected = document.querySelectorAll('.selected').length;
                     if (totalSelected === 9) {{
                         var duration = 4 * 1000;
@@ -118,7 +138,7 @@ else:
         </body>
         </html>
         """
-        st.components.v1.html(html_code, height=460)
+        st.components.v1.html(html_code, height=500)
 
 st.divider()
 if st.button("🔄 Nieuwe Kaart"):
