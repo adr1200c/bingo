@@ -10,48 +10,6 @@ def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# 2. De "Onbreekbare" CSS
-st.markdown("""
-    <style>
-    .block-container { padding: 10px !important; max-width: 400px !important; }
-    
-    /* Het Grid: forceert 3 kolommen, zelfs op de kleinste schermen */
-    .bingo-grid {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 8px !important;
-        width: 100% !important;
-    }
-
-    /* Het klikbare vakje */
-    .bingo-item {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        position: relative;
-        cursor: pointer;
-    }
-
-    .bingo-photo {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid #eee;
-        display: block;
-    }
-
-    .found {
-        filter: grayscale(100%) opacity(0.3);
-        border: 3px solid #4CAF50 !important;
-    }
-
-    /* Verberg de standaard knoppen die we nu niet meer nodig hebben voor het grid */
-    .stButton button { width: 100%; }
-    
-    h1 { text-align: center; font-size: 20px !important; }
-    </style>
-    """, unsafe_allow_html=True)
-
 st.title("📸 Familie Bingo")
 
 IMAGE_DIR = "familie_fotos"
@@ -68,10 +26,37 @@ else:
             st.session_state.my_cards = random.sample(all_photos, 9)
             st.session_state.found = [False] * 9
 
-        # 3. Bouw het grid in één HTML blok
-        # We maken een grote string met alle HTML
-        grid_html = '<div class="bingo-grid">'
-        
+        # 2. De HTML & CSS voor het onbreekbare Grid
+        # We bouwen een tabel die Safari NIET kan breken
+        grid_html = """
+        <style>
+            .bingo-table {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+            }
+            .bingo-td {
+                padding: 4px;
+                text-align: center;
+                width: 33.33%;
+            }
+            .bingo-img {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 2px solid #ddd;
+                display: block;
+            }
+            .found {
+                filter: grayscale(100%) opacity(0.3);
+                border: 2px solid #4CAF50;
+            }
+        </style>
+        <table class="bingo-table">
+            <tr>
+        """
+
         for i in range(9):
             photo_name = st.session_state.my_cards[i]
             is_found = st.session_state.found[i]
@@ -82,29 +67,36 @@ else:
                 ext = photo_name.split('.')[-1]
                 status_class = "found" if is_found else ""
                 
-                # Elke foto wordt een link die een 'trigger' verstuurt naar Streamlit
                 grid_html += f'''
-                    <div class="bingo-item">
-                        <img src="data:image/{ext};base64,{img_b64}" class="bingo-photo {status_class}">
-                    </div>
+                    <td class="bingo-td">
+                        <img src="data:image/{ext};base64,{img_b64}" class="bingo-img {status_class}">
+                        <div style="font-size:12px; margin-top:4px;">Foto {i+1}</div>
+                    </td>
                 '''
+                
+                if (i + 1) % 3 == 0 and i < 8:
+                    grid_html += '</tr><tr>'
             except:
-                grid_html += '<div class="bingo-item" style="background:#eee;">err</div>'
-        
-        grid_html += '</div>'
-        
-        # Toon de volledige tabel
-        st.markdown(grid_html, unsafe_allow_html=True)
+                grid_html += '<td class="bingo-td">⚠️</td>'
 
-        # Omdat we in pure HTML geen klik-events naar Python kunnen sturen zonder 
-        # ingewikkelde componenten, gebruiken we hieronder simpele knoppen 
-        # om de status per nummer bij te werken.
-        st.write("Tik op het nummer om af te strepen:")
-        cols = st.columns(9)
+        grid_html += "</tr></table>"
+
+        # 3. Render het Grid in één keer
+        st.write("---")
+        st.components.v1.html(grid_html, height=450) # Dit is de "muur" waar Safari niet doorheen komt
+        st.write("---")
+
+        # 4. De knoppen om af te vinken (in een compact grid eronder)
+        st.write("Tik op de nummers die je hebt gevonden:")
+        row1 = st.columns(3)
+        row2 = st.columns(3)
+        row3 = st.columns(3)
+        all_cols = row1 + row2 + row3
+
         for i in range(9):
-            with cols[i]:
-                label = "✅" if st.session_state.found[i] else str(i+1)
-                if st.button(label, key=f"check_{i}"):
+            with all_cols[i]:
+                label = f"✅ {i+1}" if st.session_state.found[i] else f"Kies {i+1}"
+                if st.button(label, key=f"btn_{i}"):
                     st.session_state.found[i] = not st.session_state.found[i]
                     st.rerun()
 
