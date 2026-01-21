@@ -16,7 +16,7 @@ st.markdown("""
     <style>
     /* Forceer de hoofdcontainer om niet te breed te worden */
     .main .block-container {
-        max-width: 500px !important;
+        max-width: 250px !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
     }
@@ -27,7 +27,7 @@ st.markdown("""
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         gap: 5px !important;
-        width: 100% !important;
+        width: 50% !important;
     }
     
     [data-testid="column"] {
