@@ -28,12 +28,27 @@ def get_base64_image(image_path):
 
 st.title("📸 Rietman Familie Bingo")
 
-IMAGE_DIR = "familie_fotos"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+IMAGE_DIR = BASE_DIR
 
 if not os.path.exists(IMAGE_DIR):
-    st.error("Map 'familie_fotos' niet gevonden.")
+    st.error("Basismap niet gevonden.")
 else:
-    all_photos = sorted([f for f in os.listdir(IMAGE_DIR) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))])
+    all_photos = []
+    for root, dirs, files in os.walk(IMAGE_DIR):
+        # Sla bestanden in de root (de map van bingo.py) zelf over; neem alleen subfolders mee
+        if os.path.abspath(root) == os.path.abspath(IMAGE_DIR):
+            continue
+        for f in files:
+            if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                rel_path = os.path.relpath(os.path.join(root, f), IMAGE_DIR)
+                all_photos.append(rel_path)
+    all_photos = sorted(all_photos)
+
+    # Geef voorrang aan submap 'stedenendorpen'
+    priority_folder = os.path.join('stedenendorpen')
+    priority_photos = [p for p in all_photos if p.split(os.sep)[0] == 'stedenendorpen']
+    other_photos = [p for p in all_photos if p.split(os.sep)[0] != 'stedenendorpen']
 
     if len(all_photos) < 9:
         st.warning(f"Voeg minimaal 9 foto's toe.")
@@ -46,20 +61,51 @@ else:
         if 'my_cards' not in st.session_state:
             # We zetten de random generator even 'vast' op de datum van vandaag
             random.seed(today_seed)
-            # Kies 9 foto's (deze 9 zijn voor iedereen vandaag hetzelfde)
-            selected_photos = random.sample(all_photos, 9)
+            # Kies eerst uit prioritaire foto's, vul aan uit overige
+            pri = priority_photos.copy()
+            oth = other_photos.copy()
+            random.shuffle(pri)
+            random.shuffle(oth)
+            combined = (pri + oth)[:max(9, 9)]
+            if len(pri) >= 9:
+                pool = pri
+            else:
+                pool = pri + oth
+            if len(pool) < 9:
+                st.warning("Onvoldoende afbeeldingen om 9 kaarten te vullen.")
+                st.stop()
+            selected_photos = pool[:9]
             # Schud ze daarna voor deze specifieke gebruiker (zodat niet iedereen dezelfde kaart heeft)
-            # We gebruiken hiervoor een unieke sessie-id of gewoon een nieuwe random actie
-            random.seed() # Zet random weer 'vrij'
+            random.seed()  # Zet random weer 'vrij'
             random.shuffle(selected_photos)
             st.session_state.my_cards = selected_photos
 
-        paths = [os.path.join(IMAGE_DIR, name) for name in st.session_state.my_cards]
+        paths = [os.path.join(BASE_DIR, name) for name in st.session_state.my_cards]
         b64_list = []
         for p in paths:
             b64 = get_base64_image(p)
             if b64:
                 b64_list.append(b64)
+
+        # Zoek naar een 'landkaart' afbeelding (bestandsnaam begint met 'landkaart')
+        map_b64 = None
+        try:
+            # Zoek in de hoofdfolder (naast bingo.py) naar een bestand dat met 'landkaart' begint
+            for fname in os.listdir(BASE_DIR):
+                low = fname.lower()
+                if low.startswith('landkaart') and low.endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                    map_path = os.path.join(BASE_DIR, fname)
+                    map_b64 = get_base64_image(map_path)
+                    break
+        except Exception:
+            map_b64 = None
+
+        if not map_b64:
+            st.warning("Landkaart niet gevonden. Plaats een bestand 'landkaart.jpg' (of .png/.jpeg/.webp) naast bingo.py.")
+
+        overlay_style = ""
+        if map_b64:
+            overlay_style = f"background-image: url('data:image/jpeg;base64,{map_b64}');"
         
         html_code = f"""
         <html>
@@ -72,8 +118,11 @@ else:
                     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                     background: #ffffff; z-index: 100; display: flex; flex-direction: column;
                     justify-content: center; align-items: center; text-align: center;
+                    background-size: cover; background-position: center; background-repeat: no-repeat;
+                    backdrop-filter: none;
                 }}
                 .btn-container {{ display: flex; flex-direction: column; gap: 15px; width: 280px; }}
+                .overlay-shade {{ background: rgba(255,255,255,0.6); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }}
                 .start-btn {{ padding: 20px; font-size: 18px; cursor: pointer; background: linear-gradient(135deg, #42a5f5, #1e88e5); color: white; border: none; border-radius: 15px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }}
                 .start-btn.silent {{ background: #757575; }}
                 
@@ -97,11 +146,13 @@ else:
             </style>
         </head>
         <body>
-            <div id="overlay">
-                <h3 style="color: #333; margin-bottom: 25px;">Rietman Familie Bingo</h3>
-                <div class="btn-container">
-                    <button class="start-btn" onclick="startBingo(true)">Speel met Geluid 🔊</button>
-                    <button class="start-btn silent" onclick="startBingo(false)">Stil Spelen 🔇</button>
+            <div id="overlay" style="{overlay_style}">
+                <div class="overlay-shade">
+                    <h3 style="color: #333; margin-bottom: 25px;">Rietman Familie Bingo</h3>
+                    <div class="btn-container">
+                        <button class="start-btn" onclick="startBingo(true)">Speel met Geluid 🔊</button>
+                        <button class="start-btn silent" onclick="startBingo(false)">Stil Spelen 🔇</button>
+                    </div>
                 </div>
             </div>
 
@@ -182,3 +233,4 @@ else:
         </html>
         """
         st.components.v1.html(html_code, height=640)
+
