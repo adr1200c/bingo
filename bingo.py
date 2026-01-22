@@ -234,3 +234,105 @@ else:
         """
         st.components.v1.html(html_code, height=640)
 
+        st.divider()
+        st.subheader("🖨️ Printbare kaarten genereren")
+        num_cards = st.number_input("Aantal kaarten (1 per pagina)", min_value=1, max_value=200, value=35, step=1)
+        if st.button("Genereer printbare kaarten"):
+            # Helper: maak een functie om 9 foto's te kiezen volgens prioriteitslogica
+            def pick_nine():
+                # hergebruik dezelfde pri/oth lijsten
+                local_pri = priority_photos.copy()
+                local_oth = other_photos.copy()
+                random.shuffle(local_pri)
+                random.shuffle(local_oth)
+                pool = local_pri if len(local_pri) >= 9 else (local_pri + local_oth)
+                return pool[:9]
+            # Bouw HTML voor printen: 1 kaart per pagina
+            print_cards_html = """
+            <html>
+            <head>
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+                <style>
+                    @page { size: A4; margin: 12mm; }
+                    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+                    .card { padding: 6mm 0; page-break-before: always; page-break-after: always; break-before: page; break-after: page; break-inside: avoid; display: flex; flex-direction: column; align-items: center; }
+                    .title { margin: 6px 0 10px; font-weight: 600; color: #333; }
+                    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 175mm; max-width: 100%; }
+                    .cell { aspect-ratio: 1/1; border: 2px solid #000; border-radius: 6px; overflow: hidden; }
+                    .cell img { width: 100%; height: 100%; object-fit: cover; }
+                </style>
+            </head>
+            <body>
+            """
+
+            for i in range(int(num_cards)):
+                selected = pick_nine()
+                # Zet om naar base64
+                imgs = []
+                for rel in selected:
+                    pth = os.path.join(BASE_DIR, rel)
+                    b64 = get_base64_image(pth)
+                    if b64:
+                        imgs.append(b64)
+                # Render kaart
+                print_cards_html += f"<div class='card'><div class='title'>Kaart {i+1}</div><div class='grid'>" + \
+                    "".join([f"<div class='cell'><img src='data:image/jpeg;base64,{b}'></div>" for b in imgs]) + \
+                    "</div></div>"
+
+            print_cards_html += "</body></html>"
+
+            # Toon in de app
+            st.components.v1.html(print_cards_html, height=900, scrolling=True)
+
+            # Downloadknop voor HTML-bestand
+            st.download_button(
+                label="Download als HTML",
+                data=print_cards_html.encode('utf-8'),
+                file_name="print_kaarten.html",
+                mime="text/html"
+            )
+
+        st.divider()
+        st.subheader("📄 Foto’s uit verhaal.docx naar TXT")
+        try:
+            import docx  # python-docx
+            docx_path = os.path.join(BASE_DIR, "verhaal.docx")
+            if os.path.exists(docx_path):
+                # Lees alle tekst uit het docx
+                doc = docx.Document(docx_path)
+                full_text = "\n".join([p.text for p in doc.paragraphs]).lower()
+
+                # Maak een mapping: fotopad -> naam zonder extensie (alleen basename)
+                def name_key(p):
+                    base = os.path.basename(p)
+                    name, _ = os.path.splitext(base)
+                    return name.lower()
+
+                # Vind matches in volgorde van voorkomen in de tekst
+                matched = []
+                seen = set()
+                for p in all_photos:
+                    key = name_key(p)
+                    if key and key not in seen and key in full_text:
+                        seen.add(key)
+                        matched.append(p)
+                st.write(f"Gevonden foto’s in verhaal: {len(matched)}")
+                if matched:
+                    # Toon lijst en downloadknop
+                    with st.expander("Toon lijst"):
+                        for m in matched:
+                            st.write(m)
+                    txt_content = "\n".join(matched)
+                    st.download_button(
+                        label="Download fotolijst (TXT)",
+                        data=txt_content.encode('utf-8'),
+                        file_name="verhaal_fotolijst.txt",
+                        mime="text/plain"
+                    )
+                else:
+                    st.info("Geen fotonamen gevonden in verhaal.docx. Controleer of bestandsnamen (zonder extensie) in de tekst voorkomen.")
+            else:
+                st.warning("verhaal.docx niet gevonden naast bingo.py.")
+        except ImportError:
+            st.warning("python-docx niet geïnstalleerd. Installeer met: pip install python-docx")
+
