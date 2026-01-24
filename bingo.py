@@ -335,6 +335,22 @@ if uploaded_html is not None:
                 for iv in invalid:
                     st.write(iv)
         if valid_sequence:
+            # Groepeer geldige paden per submap (1 stap = alle foto's in submap van 'stedenendorpen')
+            # We nemen de eerste mapcomponent als staplabel, bijvoorbeeld 'stedenendorpen/Apeldoorn/...'
+            # => staplabel = 'stedenendorpen/Apeldoorn'
+            from collections import OrderedDict
+            folder_map = OrderedDict()
+            for h in valid_sequence:
+                parts = h.split(os.sep)
+                if len(parts) >= 2 and parts[0] == 'stedenendorpen':
+                    step_label = os.path.join(parts[0], parts[1])
+                else:
+                    # Valt buiten 'stedenendorpen' => elke losse foto wordt eigen staplabel
+                    step_label = os.path.dirname(h) or h
+                folder_map.setdefault(step_label, []).append(h)
+            # Maak een geordende lijst van (label, items)
+            folder_steps = list(folder_map.items())
+
             # Controls for simulation
             num_players_html = st.number_input("Aantal spelers (HTML import)", min_value=1, max_value=500, value=35, step=1, key="players_html")
             day_pool_size = st.slider("Dagpool-grootte (meer overlap = hogere kans op 2 rijen/volle kaart)", min_value=9, max_value=30, value=15, step=1, help="De set waaruit alle kaarten worden samengesteld. Kleinere dagpool betekent dat kaarten meer items delen.")
@@ -355,7 +371,7 @@ if uploaded_html is not None:
                     return random.sample(day_pool, 9)
                 cards = [make_card_from_daypool() for _ in range(int(num_players_html))]
 
-                selected_sets = [set() for _ in cards]
+                # Simulatie: 1 stap = alle items binnen dezelfde submap (folder_steps)
                 results = []
                 first_bingo_step = None
                 first_bingo_count = 0
@@ -375,12 +391,20 @@ if uploaded_html is not None:
                     d = sum(1 for a,b,c in diags if mask[a] and mask[b] and mask[c])
                     return {"h": h, "v": v, "d": d, "total": h+v+d}
 
-                for step, item in enumerate(valid_sequence, start=1):
+                # Reset geselecteerde sets per kaart
+                selected_sets = [set() for _ in cards]
+
+                for step_idx, (step_label, items_in_step) in enumerate(folder_steps, start=1):
+                    # Markeer alle items uit deze submap tegelijk
                     for idx, card in enumerate(cards):
-                        if item in card:
-                            selected_sets[idx].add(item)
+                        # Voeg alle items die in de kaart voorkomen toe
+                        for itm in items_in_step:
+                            if itm in card:
+                                selected_sets[idx].add(itm)
+
                     one_line = two_lines = full_cards = 0
                     horiz_cards = vert_cards = diag_cards = 0
+
                     for idx, card in enumerate(cards):
                         mask = [c in selected_sets[idx] for c in card]
                         bd = line_breakdown(mask)
@@ -390,7 +414,8 @@ if uploaded_html is not None:
                         if not has_one_line[idx] and wins >= 1:
                             has_one_line[idx] = True
                             events.append({
-                                "step": step,
+                                "step": step_idx,
+                                "step_label": step_label,
                                 "card": idx + 1,
                                 "type": "1 rij",
                                 "h": bd["h"], "v": bd["v"], "d": bd["d"], "total": wins,
@@ -399,7 +424,8 @@ if uploaded_html is not None:
                         if not has_two_lines[idx] and wins >= 2:
                             has_two_lines[idx] = True
                             events.append({
-                                "step": step,
+                                "step": step_idx,
+                                "step_label": step_label,
                                 "card": idx + 1,
                                 "type": "2 rijen",
                                 "h": bd["h"], "v": bd["v"], "d": bd["d"], "total": wins,
@@ -408,7 +434,8 @@ if uploaded_html is not None:
                         if not has_full[idx] and all(mask):
                             has_full[idx] = True
                             events.append({
-                                "step": step,
+                                "step": step_idx,
+                                "step_label": step_label,
                                 "card": idx + 1,
                                 "type": "Volle kaart",
                                 "h": bd["h"], "v": bd["v"], "d": bd["d"], "total": wins,
@@ -427,8 +454,10 @@ if uploaded_html is not None:
                             two_lines += 1
                         if all(mask):
                             full_cards += 1
+
                     results.append({
-                        "step": step,
+                        "step": step_idx,
+                        "step_label": step_label,
                         "horiz": horiz_cards,
                         "vert": vert_cards,
                         "diag": diag_cards,
@@ -436,23 +465,60 @@ if uploaded_html is not None:
                         "two_lines": two_lines,
                         "full": full_cards
                     })
+
                     if first_bingo_step is None and one_line > 0:
-                        first_bingo_step = step
+                        first_bingo_step = step_idx
                         first_bingo_count = one_line
 
-                st.write("Resultaten per stap (HTML import):")
+                st.write("Resultaten per stap (HTML import, per submap):")
                 for r in results:
                     st.write(
-                        f"Stap {r['step']}: Horizontaal = {r['horiz']}, Verticaal = {r['vert']}, Diagonaal = {r['diag']}, "
+                        f"Stap {r['step']} — {r['step_label']}: Horizontaal = {r['horiz']}, Verticaal = {r['vert']}, Diagonaal = {r['diag']}, "
                         f"1 rij = {r['one_line']}, 2 rijen = {r['two_lines']}, volle kaart = {r['full']}"
                     )
+
+                first_label = None
                 if first_bingo_step is not None:
-                    st.success(f"Eerste bingo valt bij stap {first_bingo_step} met {first_bingo_count} winnaar(s).")
+                    for r in results:
+                        if r['step'] == first_bingo_step:
+                            first_label = r.get('step_label')
+                            break
+
+                if first_bingo_step is not None:
+                    if first_label:
+                        st.success(f"Eerste bingo valt bij stap {first_bingo_step} ({first_label}) met {first_bingo_count} winnaar(s).")
+                    else:
+                        st.success(f"Eerste bingo valt bij stap {first_bingo_step} met {first_bingo_count} winnaar(s).")
                 else:
                     st.info("Geen bingo gevallen binnen de geïmporteerde volgorde.")
 
                 # Chronological list of bingo events
                 if events:
+                    # Milestones: first 1-row bingo, first 2-rows bingo, first full card
+                    first_one = next((e for e in events if e["type"] == "1 rij"), None)
+                    first_two = next((e for e in events if e["type"] == "2 rijen"), None)
+                    first_full = next((e for e in events if e["type"] == "Volle kaart"), None)
+
+                    st.subheader("🏁 Mijlpalen")
+                    def _fmt_details(e):
+                        parts = []
+                        if e.get("h"): parts.append(f"Horizontaal x{e['h']}")
+                        if e.get("v"): parts.append(f"Verticaal x{e['v']}")
+                        if e.get("d"): parts.append(f"Diagonaal x{e['d']}")
+                        return ", ".join(parts)
+
+                    if first_one:
+                        det = _fmt_details(first_one)
+                        st.write(f"Eerste bingo (1 rij) — Stap {first_one['step']} ({first_one.get('step_label','')}) — Kaart {first_one['card']}" + (f" ({det})" if det else ""))
+                    if first_two:
+                        det = _fmt_details(first_two)
+                        st.write(f"Tweede bingo (2 rijen) — Stap {first_two['step']} ({first_two.get('step_label','')}) — Kaart {first_two['card']}" + (f" ({det})" if det else ""))
+                    if first_full:
+                        det = _fmt_details(first_full)
+                        st.write(f"Volle kaart — Stap {first_full['step']} ({first_full.get('step_label','')}) — Kaart {first_full['card']}" + (f" ({det})" if det else ""))
+
+                    st.write("")
+
                     st.write("Alle bingo’s in volgorde:")
                     # Sort by step, then by card
                     events.sort(key=lambda e: (e["step"], e["card"]))
@@ -465,7 +531,8 @@ if uploaded_html is not None:
                         if e["d"]:
                             details.append(f"Diagonaal x{e['d']}")
                         detail_str = ", ".join(details) if details else ""
-                        st.write(f"Stap {e['step']} — Kaart {e['card']}: {e['type']}" + (f" ({detail_str})" if detail_str else ""))
+                        step_lbl = f" ({e.get('step_label','')})" if e.get('step_label') else ""
+                        st.write(f"Stap {e['step']}{step_lbl} — Kaart {e['card']}: {e['type']}" + (f" ({detail_str})" if detail_str else ""))
                 else:
                     st.info("Geen bingo-events geregistreerd.")
     except Exception as e:
@@ -546,4 +613,6 @@ if beauty_file is not None:
         st.info("De HTML is opgeschoond en opgemaakt. Afbeeldingen zijn gewrapt in figure-blokken met captions. Tekst is behouden.")
     except Exception as e:
         st.error(f"Kon verhaal.html niet beautify-en: {e}")
+
+
 
