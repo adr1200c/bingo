@@ -45,10 +45,10 @@ else:
                 all_photos.append(rel_path)
     all_photos = sorted(all_photos)
 
-    # Geef voorrang aan submap 'stedenendorpen'
-    priority_folder = os.path.join('stedenendorpen')
-    priority_photos = [p for p in all_photos if p.split(os.sep)[0] == 'stedenendorpen']
-    other_photos = [p for p in all_photos if p.split(os.sep)[0] != 'stedenendorpen']
+    # Geef voorrang aan submap 'pool'
+    priority_folder = os.path.join('pool')
+    priority_photos = [p for p in all_photos if p.split(os.sep)[0] == 'pool']
+    other_photos = [p for p in all_photos if p.split(os.sep)[0] != 'pool']
 
     if len(all_photos) < 9:
         st.warning(f"Voeg minimaal 9 foto's toe.")
@@ -335,17 +335,17 @@ if uploaded_html is not None:
                 for iv in invalid:
                     st.write(iv)
         if valid_sequence:
-            # Groepeer geldige paden per submap (1 stap = alle foto's in submap van 'stedenendorpen')
-            # We nemen de eerste mapcomponent als staplabel, bijvoorbeeld 'stedenendorpen/Apeldoorn/...'
-            # => staplabel = 'stedenendorpen/Apeldoorn'
+            # Groepeer geldige paden per submap (1 stap = alle foto's in submap van 'pool')
+            # We nemen de eerste mapcomponent als staplabel, bijvoorbeeld 'pool/Apeldoorn/...'
+            # => staplabel = 'pool/Apeldoorn'
             from collections import OrderedDict
             folder_map = OrderedDict()
             for h in valid_sequence:
                 parts = h.split(os.sep)
-                if len(parts) >= 2 and parts[0] == 'stedenendorpen':
+                if len(parts) >= 2 and parts[0] == 'pool':
                     step_label = os.path.join(parts[0], parts[1])
                 else:
-                    # Valt buiten 'stedenendorpen' => elke losse foto wordt eigen staplabel
+                    # Valt buiten 'pool' => elke losse foto wordt eigen staplabel
                     step_label = os.path.dirname(h) or h
                 folder_map.setdefault(step_label, []).append(h)
             # Maak een geordende lijst van (label, items)
@@ -544,7 +544,7 @@ if uploaded_html is not None:
 st.divider()
 st.subheader("🏙️ Index.html genereren voor dorpen/steden")
 
-st.markdown("Deze actie maakt of update een index.html in elke submap van 'stedenendorpen', met een korte beschrijving en links naar de afbeeldingen in die map.")
+st.markdown("Deze actie maakt of update een index.html in elke submap van 'pool', met een korte beschrijving en links naar de afbeeldingen in die map.")
 
 colA, colB = st.columns([1,1])
 with colA:
@@ -555,9 +555,9 @@ with colB:
 if st.button("Genereer index.html bestanden"):
     try:
         # Base folder for priority photos
-        steden_dir = os.path.join(BASE_DIR, 'stedenendorpen')
-        if not os.path.isdir(steden_dir):
-            st.error("Map 'stedenendorpen' niet gevonden naast bingo.py.")
+        pool_dir = os.path.join(BASE_DIR, 'pool')
+        if not os.path.isdir(pool_dir):
+            st.error("Map 'pool' niet gevonden naast bingo.py.")
         else:
 
             # Probeer beschrijvingen te laden uit JSON
@@ -577,10 +577,10 @@ if st.button("Genereer index.html bestanden"):
             updated = 0
             skipped = 0
 
-            # We verwachten structuur: stedenendorpen/<Plaatsnaam>/... (eventueel diepere submappen)
-            # We nemen alleen de eerste laag mappen direct onder 'stedenendorpen' als 'plaatsmap'.
-            for name in sorted(os.listdir(steden_dir)):
-                place_path = os.path.join(steden_dir, name)
+            # We verwachten structuur: pool/<Plaatsnaam>/... (eventueel diepere submappen)
+            # We nemen alleen de eerste laag mappen direct onder 'pool' als 'plaatsmap'.
+            for name in sorted(os.listdir(pool_dir)):
+                place_path = os.path.join(pool_dir, name)
                 if not os.path.isdir(place_path):
                     continue
 
@@ -682,12 +682,12 @@ if st.button("Genereer index.html bestanden"):
         st.error(f"Kon index.html bestanden niet genereren: {e}")
 
 # -----------------------------
-# Sync beschrijvingen.json met subfolders in 'stedenendorpen'
+# Sync beschrijvingen.json met subfolders in 'pool'
 # -----------------------------
 st.divider()
 st.subheader("🧭 Synchroniseer beschrijvingen.json met mappen")
 
-st.markdown("Houd beschrijvingen.json in sync met de submappen in 'stedenendorpen'. Ontbrekende plaatsen worden toegevoegd met de standaardtekst. Optioneel kun je entries verwijderen die geen corresponderende map meer hebben.")
+st.markdown("Houd beschrijvingen.json in sync met de submappen in 'pool'. Ontbrekende plaatsen worden toegevoegd met de standaardtekst. Optioneel kun je entries verwijderen die geen corresponderende map meer hebben.")
 
 col1, col2 = st.columns([1,1])
 with col1:
@@ -697,9 +697,9 @@ with col2:
 
 if st.button("Synchroniseer beschrijvingen.json"):
     try:
-        steden_dir = os.path.join(BASE_DIR, 'stedenendorpen')
-        if not os.path.isdir(steden_dir):
-            st.error("Map 'stedenendorpen' niet gevonden naast bingo.py.")
+        pool_dir = os.path.join(BASE_DIR, 'pool')
+        if not os.path.isdir(pool_dir):
+            st.error("Map 'pool' niet gevonden naast bingo.py.")
         else:
             # Lees bestaande JSON
             json_path = os.path.join(BASE_DIR, 'beschrijvingen.json')
@@ -721,7 +721,7 @@ if st.button("Synchroniseer beschrijvingen.json"):
                 data['_default'] = default_tpl
 
             # Verzamel plaatsmappen (alleen eerste laag)
-            places_on_disk = [name for name in sorted(os.listdir(steden_dir)) if os.path.isdir(os.path.join(steden_dir, name))]
+            places_on_disk = [name for name in sorted(os.listdir(pool_dir)) if os.path.isdir(os.path.join(pool_dir, name))]
 
             added = []
             removed = []
@@ -838,6 +838,7 @@ if beauty_file is not None:
         st.info("De HTML is opgeschoond en opgemaakt. Afbeeldingen zijn gewrapt in figure-blokken met captions. Tekst is behouden.")
     except Exception as e:
         st.error(f"Kon verhaal.html niet beautify-en: {e}")
+
 
 
 

@@ -68,8 +68,8 @@ def load_descriptions(base_dir: str) -> dict:
         pass
     return {}
 
-def sync_descriptions(base_dir: str, steden_dir: str, remove_orphans: bool = False) -> tuple[int, int]:
-    """Synchronize beschrijvingen.json with folders under steden_dir.
+def sync_descriptions(base_dir: str, pool_dir: str, remove_orphans: bool = False) -> tuple[int, int]:
+    """Synchronize beschrijvingen.json with folders under pool_dir.
     Returns (added, removed)."""
     path = os.path.join(base_dir, 'beschrijvingen.json')
     # Load existing data
@@ -88,7 +88,7 @@ def sync_descriptions(base_dir: str, steden_dir: str, remove_orphans: bool = Fal
         data['_default'] = default_tpl
 
     # Collect first-level folders
-    places_on_disk = [name for name in sorted(os.listdir(steden_dir)) if os.path.isdir(os.path.join(steden_dir, name))]
+    places_on_disk = [name for name in sorted(os.listdir(pool_dir)) if os.path.isdir(os.path.join(pool_dir, name))]
 
     added = 0
     removed = 0
@@ -146,7 +146,7 @@ def build_html(place_name: str, images: List[str], with_gallery: bool, beschrijv
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Genereer index.html in elke submap van 'stedenendorpen'.")
+    parser = argparse.ArgumentParser(description="Genereer index.html in elke submap van 'pool'.")
     parser.add_argument('--base', type=str, default=None, help="Basismap (standaard: map van dit script)")
     parser.add_argument('--overwrite', action='store_true', help="Overschrijf bestaande index.html")
     parser.add_argument('--no-gallery', action='store_true', help="Schakel de afbeeldingsgalerij uit")
@@ -155,14 +155,14 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     base_dir = args.base if args.base else os.path.dirname(os.path.abspath(__file__))
-    steden_dir = os.path.join(base_dir, 'stedenendorpen')
+    pool_dir = os.path.join(base_dir, 'pool')
 
-    if not os.path.isdir(steden_dir):
-        print("FOUT: Map 'stedenendorpen' niet gevonden in", base_dir)
+    if not os.path.isdir(pool_dir):
+        print("FOUT: Map 'pool' niet gevonden in", base_dir)
         return 2
 
     if args.sync_descriptions:
-        added, removed = sync_descriptions(base_dir, steden_dir, remove_orphans=args.remove_orphans)
+        added, removed = sync_descriptions(base_dir, pool_dir, remove_orphans=args.remove_orphans)
         print(f"Synchronisatie beschrijvingen.json — Toegevoegd: {added}, Verwijderd: {removed}.")
 
     descs = load_descriptions(base_dir)
@@ -171,8 +171,8 @@ def main(argv=None):
     updated = 0
     skipped = 0
 
-    for name in sorted(os.listdir(steden_dir)):
-        place_path = os.path.join(steden_dir, name)
+    for name in sorted(os.listdir(pool_dir)):
+        place_path = os.path.join(pool_dir, name)
         if not os.path.isdir(place_path):
             continue
 

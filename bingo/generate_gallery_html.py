@@ -115,22 +115,22 @@ def build_card_html(place_name: str, place_dir: str, base_dir: str, with_thumb: 
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Genereer een overzichtsgalerij met links naar plaats-indexpagina\'s.')
     parser.add_argument('--base', type=str, default=None, help='Basismap (standaard: map van dit script)')
-    parser.add_argument('--output', type=str, default='stedenendorpen_galerij.html', help='Uitvoerbestand (HTML)')
+    parser.add_argument('--output', type=str, default='pool_galerij.html', help='Uitvoerbestand (HTML)')
     parser.add_argument('--no-thumbs', action='store_true', help='Genereer geen thumbnails')
     args = parser.parse_args(argv)
 
     base_dir = args.base if args.base else os.path.dirname(os.path.abspath(__file__))
-    steden_dir = os.path.join(base_dir, 'stedenendorpen')
+    pool_dir = os.path.join(base_dir, 'pool')
 
-    if not os.path.isdir(steden_dir):
-        print("FOUT: Map 'stedenendorpen' niet gevonden in", base_dir)
+    if not os.path.isdir(pool_dir):
+        print("FOUT: Map 'pool' niet gevonden in", base_dir)
         return 2
 
     descs = load_descriptions(base_dir)
 
-    places = [name for name in sorted(os.listdir(steden_dir)) if os.path.isdir(os.path.join(steden_dir, name))]
+    places = [name for name in sorted(os.listdir(pool_dir)) if os.path.isdir(os.path.join(pool_dir, name))]
     if not places:
-        print("Geen plaatsmappen gevonden onder 'stedenendorpen'.")
+        print("Geen plaatsmappen gevonden onder 'pool'.")
 
     title = 'Overzicht dorpen en steden'
     subtitle = 'Klik op een kaart om de indexpagina van het dorp of de stad te openen.'
@@ -138,7 +138,7 @@ def main(argv=None):
     html = [HTML_HEAD.format(title=title, subtitle=subtitle)]
 
     for name in places:
-        place_dir = os.path.join(steden_dir, name)
+        place_dir = os.path.join(pool_dir, name)
         card = build_card_html(name, place_dir, base_dir, with_thumb=(not args.no_thumbs), descs=descs)
         html.append(card)
 
@@ -152,3 +152,4 @@ def main(argv=None):
 
 if __name__ == '__main__':
     sys.exit(main())
+

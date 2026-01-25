@@ -7,72 +7,255 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		846B20D72F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20D82F2657D3008D11EF /* moelndekoeermelo.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = moelndekoeermelo.jpeg; sourceTree = "<group>"; };
+		846B20DA2F2657D3008D11EF /* images-6.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-6.jpeg"; sourceTree = "<group>"; };
+		846B20DB2F2657D3008D11EF /* images-7.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-7.jpeg"; sourceTree = "<group>"; };
+		846B20DC2F2657D3008D11EF /* images-8.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-8.jpeg"; sourceTree = "<group>"; };
+		846B20DD2F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20DE2F2657D3008D11EF /* oudeburgijsselmuiden.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudeburgijsselmuiden.jpeg; sourceTree = "<group>"; };
+		846B20E02F2657D3008D11EF /* echternach.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = echternach.jpeg; sourceTree = "<group>"; };
+		846B20E12F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20E32F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20E42F2657D3008D11EF /* moeldndegoedehoopbeijerland.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = moeldndegoedehoopbeijerland.jpeg; sourceTree = "<group>"; };
+		846B20E62F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20E72F2657D3008D11EF /* wittekerkjepernis.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = wittekerkjepernis.jpeg; sourceTree = "<group>"; };
+		846B20E92F2657D3008D11EF /* images-2.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-2.jpeg"; sourceTree = "<group>"; };
+		846B20EA2F2657D3008D11EF /* images-3.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-3.jpeg"; sourceTree = "<group>"; };
+		846B20EB2F2657D3008D11EF /* images-4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-4.jpeg"; sourceTree = "<group>"; };
+		846B20EC2F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20ED2F2657D3008D11EF /* kampenbrug.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kampenbrug.jpeg; sourceTree = "<group>"; };
+		846B20EE2F2657D3008D11EF /* kampenkade.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kampenkade.jpeg; sourceTree = "<group>"; };
+		846B20EF2F2657D3008D11EF /* oudekadekampen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudekadekampen.jpeg; sourceTree = "<group>"; };
+		846B20F02F2657D3008D11EF /* oudekerkkampen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudekerkkampen.jpeg; sourceTree = "<group>"; };
+		846B20F22F2657D3008D11EF /* harderwijk.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = harderwijk.jpeg; sourceTree = "<group>"; };
+		846B20F32F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20F52F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20F62F2657D3008D11EF /* kerknaaldwijk.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kerknaaldwijk.jpeg; sourceTree = "<group>"; };
+		846B20F82F2657D3008D11EF /* blobeindhoven.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = blobeindhoven.jpeg; sourceTree = "<group>"; };
+		846B20F92F2657D3008D11EF /* images-2.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-2.jpeg"; sourceTree = "<group>"; };
+		846B20FA2F2657D3008D11EF /* images-5.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-5.jpeg"; sourceTree = "<group>"; };
+		846B20FB2F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20FD2F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B20FE2F2657D3008D11EF /* kerkjenuenen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kerkjenuenen.jpeg; sourceTree = "<group>"; };
+		846B21002F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B21012F2657D3008D11EF /* oudeslotveldhoven.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudeslotveldhoven.jpeg; sourceTree = "<group>"; };
+		846B21032F2657D3008D11EF /* hoogvlit.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hoogvlit.jpeg; sourceTree = "<group>"; };
+		846B21042F2657D3008D11EF /* images-3.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-3.jpeg"; sourceTree = "<group>"; };
+		846B21052F2657D3008D11EF /* images-4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-4.jpeg"; sourceTree = "<group>"; };
+		846B21062F2657D3008D11EF /* images-5.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-5.jpeg"; sourceTree = "<group>"; };
+		846B21072F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B21092F2657D3008D11EF /* domutrecht.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = domutrecht.jpeg; sourceTree = "<group>"; };
+		846B210A2F2657D3008D11EF /* images-3.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-3.jpeg"; sourceTree = "<group>"; };
+		846B210B2F2657D3008D11EF /* images-4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-4.jpeg"; sourceTree = "<group>"; };
+		846B210C2F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B210D2F2657D3008D11EF /* tekeningdomutrecht.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tekeningdomutrecht.jpeg; sourceTree = "<group>"; };
+		846B210F2F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B21102F2657D3008D11EF /* kerkede.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kerkede.jpeg; sourceTree = "<group>"; };
+		846B21122F2657D3008D11EF /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		846B21132F2657D3008D11EF /* markthallenrotterdam.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = markthallenrotterdam.jpeg; sourceTree = "<group>"; };
 		84E2C8C12F264673007AE66F /* bingo.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = bingo.py; sourceTree = "<group>"; };
 		84E2C8C22F264673007AE66F /* foutelandkaart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = foutelandkaart.png; sourceTree = "<group>"; };
-		84E2C8C32F264673007AE66F /* gallery.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = gallery.html; sourceTree = "<group>"; };
-		84E2C8C42F264673007AE66F /* generate_gallery_html.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generate_gallery_html.py; sourceTree = "<group>"; };
-		84E2C8C52F264673007AE66F /* generate_gallery_html 2.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "generate_gallery_html 2.py"; sourceTree = "<group>"; };
 		84E2C8C62F264673007AE66F /* kaart.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = kaart.csv; sourceTree = "<group>"; };
 		84E2C8C72F264673007AE66F /* landkaartgooglemaps.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = landkaartgooglemaps.png; sourceTree = "<group>"; };
 		84E2C8C82F264673007AE66F /* requirements.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = requirements.txt; sourceTree = "<group>"; };
 		84E2C8CA2F264673007AE66F /* run.command */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = run.command; sourceTree = "<group>"; };
-		84E2C8CB2F264673007AE66F /* moelndekoeermelo.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = moelndekoeermelo.jpeg; sourceTree = "<group>"; };
-		84E2C8CD2F264673007AE66F /* images-6.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-6.jpeg"; sourceTree = "<group>"; };
-		84E2C8CE2F264673007AE66F /* images-7.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-7.jpeg"; sourceTree = "<group>"; };
-		84E2C8CF2F264673007AE66F /* images-8.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-8.jpeg"; sourceTree = "<group>"; };
-		84E2C8D02F264673007AE66F /* oudeburgijsselmuiden.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudeburgijsselmuiden.jpeg; sourceTree = "<group>"; };
-		84E2C8D22F264673007AE66F /* echternach.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = echternach.jpeg; sourceTree = "<group>"; };
-		84E2C8D42F264673007AE66F /* moeldndegoedehoopbeijerland.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = moeldndegoedehoopbeijerland.jpeg; sourceTree = "<group>"; };
-		84E2C8D62F264673007AE66F /* wittekerkjepernis.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = wittekerkjepernis.jpeg; sourceTree = "<group>"; };
-		84E2C8D82F264673007AE66F /* images-2.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-2.jpeg"; sourceTree = "<group>"; };
-		84E2C8D92F264673007AE66F /* images-3.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-3.jpeg"; sourceTree = "<group>"; };
-		84E2C8DA2F264673007AE66F /* images-4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-4.jpeg"; sourceTree = "<group>"; };
-		84E2C8DB2F264673007AE66F /* kampenbrug.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kampenbrug.jpeg; sourceTree = "<group>"; };
-		84E2C8DC2F264673007AE66F /* kampenkade.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kampenkade.jpeg; sourceTree = "<group>"; };
-		84E2C8DD2F264673007AE66F /* oudekadekampen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudekadekampen.jpeg; sourceTree = "<group>"; };
-		84E2C8DE2F264673007AE66F /* oudekerkkampen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudekerkkampen.jpeg; sourceTree = "<group>"; };
-		84E2C8E02F264673007AE66F /* harderwijk.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = harderwijk.jpeg; sourceTree = "<group>"; };
-		84E2C8E22F264673007AE66F /* kerknaaldwijk.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kerknaaldwijk.jpeg; sourceTree = "<group>"; };
-		84E2C8E42F264673007AE66F /* blobeindhoven.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = blobeindhoven.jpeg; sourceTree = "<group>"; };
-		84E2C8E52F264673007AE66F /* images-2.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-2.jpeg"; sourceTree = "<group>"; };
-		84E2C8E62F264673007AE66F /* images-5.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-5.jpeg"; sourceTree = "<group>"; };
-		84E2C8E82F264673007AE66F /* kerkjenuenen.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kerkjenuenen.jpeg; sourceTree = "<group>"; };
-		84E2C8EA2F264673007AE66F /* oudeslotveldhoven.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = oudeslotveldhoven.jpeg; sourceTree = "<group>"; };
-		84E2C8EC2F264673007AE66F /* hoogvlit.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hoogvlit.jpeg; sourceTree = "<group>"; };
-		84E2C8ED2F264673007AE66F /* images-3.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-3.jpeg"; sourceTree = "<group>"; };
-		84E2C8EE2F264673007AE66F /* images-4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-4.jpeg"; sourceTree = "<group>"; };
-		84E2C8EF2F264673007AE66F /* images-5.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-5.jpeg"; sourceTree = "<group>"; };
-		84E2C8F12F264673007AE66F /* domutrecht.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = domutrecht.jpeg; sourceTree = "<group>"; };
-		84E2C8F22F264673007AE66F /* images-3.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-3.jpeg"; sourceTree = "<group>"; };
-		84E2C8F32F264673007AE66F /* images-4.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "images-4.jpeg"; sourceTree = "<group>"; };
-		84E2C8F42F264673007AE66F /* tekeningdomutrecht.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tekeningdomutrecht.jpeg; sourceTree = "<group>"; };
-		84E2C8F62F264673007AE66F /* kerkede.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = kerkede.jpeg; sourceTree = "<group>"; };
-		84E2C8F82F264673007AE66F /* markthallenrotterdam.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = markthallenrotterdam.jpeg; sourceTree = "<group>"; };
 		84E2C8FB2F264673007AE66F /* verhaal.docx */ = {isa = PBXFileReference; lastKnownFileType = file; path = verhaal.docx; sourceTree = "<group>"; };
 		84E2C8FD2F264781007AE66F /* generate_indexes.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generate_indexes.py; sourceTree = "<group>"; };
 		84E2C8FE2F2648A3007AE66F /* beschrijvingen.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = beschrijvingen.json; sourceTree = "<group>"; };
-		84E2C8FF2F264A4E007AE66F /* generate_gallery_html 3.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = "generate_gallery_html 3.py"; sourceTree = "<group>"; };
+		84E2C8FF2F264A4E007AE66F /* generate_gallery_html.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = generate_gallery_html.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		846B20D92F2657D3008D11EF /* 01_ermelo */ = {
+			isa = PBXGroup;
+			children = (
+				846B20D72F2657D3008D11EF /* index.html */,
+				846B20D82F2657D3008D11EF /* moelndekoeermelo.jpeg */,
+			);
+			path = 01_ermelo;
+			sourceTree = "<group>";
+		};
+		846B20DF2F2657D3008D11EF /* 02_ijsselmuiden */ = {
+			isa = PBXGroup;
+			children = (
+				846B20DA2F2657D3008D11EF /* images-6.jpeg */,
+				846B20DB2F2657D3008D11EF /* images-7.jpeg */,
+				846B20DC2F2657D3008D11EF /* images-8.jpeg */,
+				846B20DD2F2657D3008D11EF /* index.html */,
+				846B20DE2F2657D3008D11EF /* oudeburgijsselmuiden.jpeg */,
+			);
+			path = 02_ijsselmuiden;
+			sourceTree = "<group>";
+		};
+		846B20E22F2657D3008D11EF /* 03_echternach */ = {
+			isa = PBXGroup;
+			children = (
+				846B20E02F2657D3008D11EF /* echternach.jpeg */,
+				846B20E12F2657D3008D11EF /* index.html */,
+			);
+			path = 03_echternach;
+			sourceTree = "<group>";
+		};
+		846B20E52F2657D3008D11EF /* 04_oudbeyerland */ = {
+			isa = PBXGroup;
+			children = (
+				846B20E32F2657D3008D11EF /* index.html */,
+				846B20E42F2657D3008D11EF /* moeldndegoedehoopbeijerland.jpeg */,
+			);
+			path = 04_oudbeyerland;
+			sourceTree = "<group>";
+		};
+		846B20E82F2657D3008D11EF /* 05_pernis */ = {
+			isa = PBXGroup;
+			children = (
+				846B20E62F2657D3008D11EF /* index.html */,
+				846B20E72F2657D3008D11EF /* wittekerkjepernis.jpeg */,
+			);
+			path = 05_pernis;
+			sourceTree = "<group>";
+		};
+		846B20F12F2657D3008D11EF /* 06_kampen */ = {
+			isa = PBXGroup;
+			children = (
+				846B20E92F2657D3008D11EF /* images-2.jpeg */,
+				846B20EA2F2657D3008D11EF /* images-3.jpeg */,
+				846B20EB2F2657D3008D11EF /* images-4.jpeg */,
+				846B20EC2F2657D3008D11EF /* index.html */,
+				846B20ED2F2657D3008D11EF /* kampenbrug.jpeg */,
+				846B20EE2F2657D3008D11EF /* kampenkade.jpeg */,
+				846B20EF2F2657D3008D11EF /* oudekadekampen.jpeg */,
+				846B20F02F2657D3008D11EF /* oudekerkkampen.jpeg */,
+			);
+			path = 06_kampen;
+			sourceTree = "<group>";
+		};
+		846B20F42F2657D3008D11EF /* 07_herderwijk */ = {
+			isa = PBXGroup;
+			children = (
+				846B20F22F2657D3008D11EF /* harderwijk.jpeg */,
+				846B20F32F2657D3008D11EF /* index.html */,
+			);
+			path = 07_herderwijk;
+			sourceTree = "<group>";
+		};
+		846B20F72F2657D3008D11EF /* 08_naaldwijk */ = {
+			isa = PBXGroup;
+			children = (
+				846B20F52F2657D3008D11EF /* index.html */,
+				846B20F62F2657D3008D11EF /* kerknaaldwijk.jpeg */,
+			);
+			path = 08_naaldwijk;
+			sourceTree = "<group>";
+		};
+		846B20FC2F2657D3008D11EF /* 09_eindhoven */ = {
+			isa = PBXGroup;
+			children = (
+				846B20F82F2657D3008D11EF /* blobeindhoven.jpeg */,
+				846B20F92F2657D3008D11EF /* images-2.jpeg */,
+				846B20FA2F2657D3008D11EF /* images-5.jpeg */,
+				846B20FB2F2657D3008D11EF /* index.html */,
+			);
+			path = 09_eindhoven;
+			sourceTree = "<group>";
+		};
+		846B20FF2F2657D3008D11EF /* 09_nuenen */ = {
+			isa = PBXGroup;
+			children = (
+				846B20FD2F2657D3008D11EF /* index.html */,
+				846B20FE2F2657D3008D11EF /* kerkjenuenen.jpeg */,
+			);
+			path = 09_nuenen;
+			sourceTree = "<group>";
+		};
+		846B21022F2657D3008D11EF /* 10_veldhoven */ = {
+			isa = PBXGroup;
+			children = (
+				846B21002F2657D3008D11EF /* index.html */,
+				846B21012F2657D3008D11EF /* oudeslotveldhoven.jpeg */,
+			);
+			path = 10_veldhoven;
+			sourceTree = "<group>";
+		};
+		846B21082F2657D3008D11EF /* 11_hoogvliet */ = {
+			isa = PBXGroup;
+			children = (
+				846B21032F2657D3008D11EF /* hoogvlit.jpeg */,
+				846B21042F2657D3008D11EF /* images-3.jpeg */,
+				846B21052F2657D3008D11EF /* images-4.jpeg */,
+				846B21062F2657D3008D11EF /* images-5.jpeg */,
+				846B21072F2657D3008D11EF /* index.html */,
+			);
+			path = 11_hoogvliet;
+			sourceTree = "<group>";
+		};
+		846B210E2F2657D3008D11EF /* 12_utrecht */ = {
+			isa = PBXGroup;
+			children = (
+				846B21092F2657D3008D11EF /* domutrecht.jpeg */,
+				846B210A2F2657D3008D11EF /* images-3.jpeg */,
+				846B210B2F2657D3008D11EF /* images-4.jpeg */,
+				846B210C2F2657D3008D11EF /* index.html */,
+				846B210D2F2657D3008D11EF /* tekeningdomutrecht.jpeg */,
+			);
+			path = 12_utrecht;
+			sourceTree = "<group>";
+		};
+		846B21112F2657D3008D11EF /* 13_ede */ = {
+			isa = PBXGroup;
+			children = (
+				846B210F2F2657D3008D11EF /* index.html */,
+				846B21102F2657D3008D11EF /* kerkede.jpeg */,
+			);
+			path = 13_ede;
+			sourceTree = "<group>";
+		};
+		846B21142F2657D3008D11EF /* 14_rotterdam */ = {
+			isa = PBXGroup;
+			children = (
+				846B21122F2657D3008D11EF /* index.html */,
+				846B21132F2657D3008D11EF /* markthallenrotterdam.jpeg */,
+			);
+			path = 14_rotterdam;
+			sourceTree = "<group>";
+		};
+		846B21152F2657D3008D11EF /* pool */ = {
+			isa = PBXGroup;
+			children = (
+				846B20D92F2657D3008D11EF /* 01_ermelo */,
+				846B20DF2F2657D3008D11EF /* 02_ijsselmuiden */,
+				846B20E22F2657D3008D11EF /* 03_echternach */,
+				846B20E52F2657D3008D11EF /* 04_oudbeyerland */,
+				846B20E82F2657D3008D11EF /* 05_pernis */,
+				846B20F12F2657D3008D11EF /* 06_kampen */,
+				846B20F42F2657D3008D11EF /* 07_herderwijk */,
+				846B20F72F2657D3008D11EF /* 08_naaldwijk */,
+				846B20FC2F2657D3008D11EF /* 09_eindhoven */,
+				846B20FF2F2657D3008D11EF /* 09_nuenen */,
+				846B21022F2657D3008D11EF /* 10_veldhoven */,
+				846B21082F2657D3008D11EF /* 11_hoogvliet */,
+				846B210E2F2657D3008D11EF /* 12_utrecht */,
+				846B21112F2657D3008D11EF /* 13_ede */,
+				846B21142F2657D3008D11EF /* 14_rotterdam */,
+			);
+			path = pool;
+			sourceTree = SOURCE_ROOT;
+		};
 		84E2C8BA2F264651007AE66F = {
 			isa = PBXGroup;
 			children = (
+				846B21152F2657D3008D11EF /* pool */,
 				84E2C8C12F264673007AE66F /* bingo.py */,
 				84E2C8C22F264673007AE66F /* foutelandkaart.png */,
-				84E2C8C32F264673007AE66F /* gallery.html */,
-				84E2C8C42F264673007AE66F /* generate_gallery_html.py */,
-				84E2C8C52F264673007AE66F /* generate_gallery_html 2.py */,
 				84E2C8C62F264673007AE66F /* kaart.csv */,
 				84E2C8C72F264673007AE66F /* landkaartgooglemaps.png */,
 				84E2C8C82F264673007AE66F /* requirements.txt */,
 				84E2C8C92F264673007AE66F /* RUISFOTOS */,
 				84E2C8CA2F264673007AE66F /* run.command */,
-				84E2C8FA2F264673007AE66F /* stedenendorpen */,
 				84E2C8FB2F264673007AE66F /* verhaal.docx */,
 				84E2C8FD2F264781007AE66F /* generate_indexes.py */,
 				84E2C8FE2F2648A3007AE66F /* beschrijvingen.json */,
-				84E2C8FF2F264A4E007AE66F /* generate_gallery_html 3.py */,
+				84E2C8FF2F264A4E007AE66F /* generate_gallery_html.py */,
 			);
 			sourceTree = "<group>";
 		};
@@ -81,165 +264,6 @@
 			children = (
 			);
 			path = RUISFOTOS;
-			sourceTree = "<group>";
-		};
-		84E2C8CC2F264673007AE66F /* 01_ermelo */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8CB2F264673007AE66F /* moelndekoeermelo.jpeg */,
-			);
-			path = 01_ermelo;
-			sourceTree = "<group>";
-		};
-		84E2C8D12F264673007AE66F /* 02_ijsselmuiden */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8CD2F264673007AE66F /* images-6.jpeg */,
-				84E2C8CE2F264673007AE66F /* images-7.jpeg */,
-				84E2C8CF2F264673007AE66F /* images-8.jpeg */,
-				84E2C8D02F264673007AE66F /* oudeburgijsselmuiden.jpeg */,
-			);
-			path = 02_ijsselmuiden;
-			sourceTree = "<group>";
-		};
-		84E2C8D32F264673007AE66F /* 03_echternach */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8D22F264673007AE66F /* echternach.jpeg */,
-			);
-			path = 03_echternach;
-			sourceTree = "<group>";
-		};
-		84E2C8D52F264673007AE66F /* 04_oudbeyerland */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8D42F264673007AE66F /* moeldndegoedehoopbeijerland.jpeg */,
-			);
-			path = 04_oudbeyerland;
-			sourceTree = "<group>";
-		};
-		84E2C8D72F264673007AE66F /* 05_pernis */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8D62F264673007AE66F /* wittekerkjepernis.jpeg */,
-			);
-			path = 05_pernis;
-			sourceTree = "<group>";
-		};
-		84E2C8DF2F264673007AE66F /* 06_kampen */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8D82F264673007AE66F /* images-2.jpeg */,
-				84E2C8D92F264673007AE66F /* images-3.jpeg */,
-				84E2C8DA2F264673007AE66F /* images-4.jpeg */,
-				84E2C8DB2F264673007AE66F /* kampenbrug.jpeg */,
-				84E2C8DC2F264673007AE66F /* kampenkade.jpeg */,
-				84E2C8DD2F264673007AE66F /* oudekadekampen.jpeg */,
-				84E2C8DE2F264673007AE66F /* oudekerkkampen.jpeg */,
-			);
-			path = 06_kampen;
-			sourceTree = "<group>";
-		};
-		84E2C8E12F264673007AE66F /* 07_herderwijk */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8E02F264673007AE66F /* harderwijk.jpeg */,
-			);
-			path = 07_herderwijk;
-			sourceTree = "<group>";
-		};
-		84E2C8E32F264673007AE66F /* 08_naaldwijk */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8E22F264673007AE66F /* kerknaaldwijk.jpeg */,
-			);
-			path = 08_naaldwijk;
-			sourceTree = "<group>";
-		};
-		84E2C8E72F264673007AE66F /* 09_eindhoven */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8E42F264673007AE66F /* blobeindhoven.jpeg */,
-				84E2C8E52F264673007AE66F /* images-2.jpeg */,
-				84E2C8E62F264673007AE66F /* images-5.jpeg */,
-			);
-			path = 09_eindhoven;
-			sourceTree = "<group>";
-		};
-		84E2C8E92F264673007AE66F /* 09_nuenen */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8E82F264673007AE66F /* kerkjenuenen.jpeg */,
-			);
-			path = 09_nuenen;
-			sourceTree = "<group>";
-		};
-		84E2C8EB2F264673007AE66F /* 10_veldhoven */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8EA2F264673007AE66F /* oudeslotveldhoven.jpeg */,
-			);
-			path = 10_veldhoven;
-			sourceTree = "<group>";
-		};
-		84E2C8F02F264673007AE66F /* 11_hoogvliet */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8EC2F264673007AE66F /* hoogvlit.jpeg */,
-				84E2C8ED2F264673007AE66F /* images-3.jpeg */,
-				84E2C8EE2F264673007AE66F /* images-4.jpeg */,
-				84E2C8EF2F264673007AE66F /* images-5.jpeg */,
-			);
-			path = 11_hoogvliet;
-			sourceTree = "<group>";
-		};
-		84E2C8F52F264673007AE66F /* 12_utrecht */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8F12F264673007AE66F /* domutrecht.jpeg */,
-				84E2C8F22F264673007AE66F /* images-3.jpeg */,
-				84E2C8F32F264673007AE66F /* images-4.jpeg */,
-				84E2C8F42F264673007AE66F /* tekeningdomutrecht.jpeg */,
-			);
-			path = 12_utrecht;
-			sourceTree = "<group>";
-		};
-		84E2C8F72F264673007AE66F /* 13_ede */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8F62F264673007AE66F /* kerkede.jpeg */,
-			);
-			path = 13_ede;
-			sourceTree = "<group>";
-		};
-		84E2C8F92F264673007AE66F /* 14_rotterdam */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8F82F264673007AE66F /* markthallenrotterdam.jpeg */,
-			);
-			path = 14_rotterdam;
-			sourceTree = "<group>";
-		};
-		84E2C8FA2F264673007AE66F /* stedenendorpen */ = {
-			isa = PBXGroup;
-			children = (
-				84E2C8CC2F264673007AE66F /* 01_ermelo */,
-				84E2C8D12F264673007AE66F /* 02_ijsselmuiden */,
-				84E2C8D32F264673007AE66F /* 03_echternach */,
-				84E2C8D52F264673007AE66F /* 04_oudbeyerland */,
-				84E2C8D72F264673007AE66F /* 05_pernis */,
-				84E2C8DF2F264673007AE66F /* 06_kampen */,
-				84E2C8E12F264673007AE66F /* 07_herderwijk */,
-				84E2C8E32F264673007AE66F /* 08_naaldwijk */,
-				84E2C8E72F264673007AE66F /* 09_eindhoven */,
-				84E2C8E92F264673007AE66F /* 09_nuenen */,
-				84E2C8EB2F264673007AE66F /* 10_veldhoven */,
-				84E2C8F02F264673007AE66F /* 11_hoogvliet */,
-				84E2C8F52F264673007AE66F /* 12_utrecht */,
-				84E2C8F72F264673007AE66F /* 13_ede */,
-				84E2C8F92F264673007AE66F /* 14_rotterdam */,
-			);
-			path = stedenendorpen;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
