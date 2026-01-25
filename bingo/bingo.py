@@ -539,6 +539,231 @@ if uploaded_html is not None:
         st.error(f"Kon verhaal.html niet verwerken: {e}")
 
 # -----------------------------
+# Generate index.html for each city/village folder
+# -----------------------------
+st.divider()
+st.subheader("🏙️ Index.html genereren voor dorpen/steden")
+
+st.markdown("Deze actie maakt of update een index.html in elke submap van 'stedenendorpen', met een korte beschrijving en links naar de afbeeldingen in die map.")
+
+colA, colB = st.columns([1,1])
+with colA:
+    add_image_gallery = st.checkbox("Voeg een eenvoudige galerij toe", value=True)
+with colB:
+    overwrite_existing = st.checkbox("Overschrijf bestaande index.html", value=False)
+
+if st.button("Genereer index.html bestanden"):
+    try:
+        # Base folder for priority photos
+        steden_dir = os.path.join(BASE_DIR, 'stedenendorpen')
+        if not os.path.isdir(steden_dir):
+            st.error("Map 'stedenendorpen' niet gevonden naast bingo.py.")
+        else:
+
+            # Probeer beschrijvingen te laden uit JSON
+            descs = {}
+            try:
+                json_path = os.path.join(BASE_DIR, 'beschrijvingen.json')
+                if os.path.exists(json_path):
+                    import json
+                    with open(json_path, 'r', encoding='utf-8') as jf:
+                        data = json.load(jf)
+                        if isinstance(data, dict):
+                            descs = data
+            except Exception:
+                descs = {}
+
+            created = 0
+            updated = 0
+            skipped = 0
+
+            # We verwachten structuur: stedenendorpen/<Plaatsnaam>/... (eventueel diepere submappen)
+            # We nemen alleen de eerste laag mappen direct onder 'stedenendorpen' als 'plaatsmap'.
+            for name in sorted(os.listdir(steden_dir)):
+                place_path = os.path.join(steden_dir, name)
+                if not os.path.isdir(place_path):
+                    continue
+
+                index_path = os.path.join(place_path, 'index.html')
+                if os.path.exists(index_path) and not overwrite_existing:
+                    skipped += 1
+                    continue
+
+                # Verzamel afbeeldingen direct in deze plaatsmap en eventuele submappen
+                # maar link ze relatief zodat ze bruikbaar zijn vanuit index.html in de plaatsmap
+                images = []
+                for root, dirs, files in os.walk(place_path):
+                    for f in files:
+                        if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                            rel = os.path.relpath(os.path.join(root, f), place_path)
+                            images.append(rel)
+                images.sort()
+
+                # Bepaal een eenvoudige titel/omschrijving op basis van de mapnaam
+                plaatsnaam = name.replace('-', ' ').replace('_', ' ')
+                title = f"{plaatsnaam.title()} — Fotoverslag"
+                # Haal beschrijving op uit JSON indien beschikbaar
+                custom = descs.get(name) or descs.get(plaatsnaam) or descs.get(name.title())
+                if not custom:
+                    default_tpl = descs.get('_default') if isinstance(descs, dict) else None
+                    if isinstance(default_tpl, str):
+                        custom = default_tpl.replace('{plaats}', plaatsnaam.title())
+                beschrijving = custom if isinstance(custom, str) else f"Welkom! Dit is een korte pagina over {plaatsnaam.title()}. Hieronder vind je een selectie afbeeldingen uit deze map."
+
+                # Bouw HTML-inhoud
+                head = """<!DOCTYPE html>
+<html lang=\"nl\">
+<head>
+  <meta charset=\"utf-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
+  <title>""" + title + """</title>
+  <style>
+    :root { --bg:#fafafa; --fg:#1a1a1a; --muted:#666; --accent:#1e88e5; --card-bg:#fff; --card-border:#eee; --maxw:900px; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,system-ui,sans-serif;line-height:1.6}
+    .container{max-width:var(--maxw);margin:0 auto;padding:24px 16px 64px}
+    header{margin:0 0 24px;padding:24px 0 8px;border-bottom:1px solid var(--card-border)}
+    header h1{margin:0 0 6px;font-size:28px;font-weight:700}
+    header p{margin:0;color:var(--muted);font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+    .tile{border:1px solid var(--card-border);border-radius:10px;overflow:hidden;background:var(--card-bg);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+    .tile img{display:block;width:100%;height:180px;object-fit:cover}
+    .tile .cap{padding:8px 10px;font-size:12px;color:var(--muted)}
+    a{color:var(--accent);text-decoration:none}
+    footer{margin-top:32px;color:var(--muted);font-size:12px}
+    @media print{ .tile{box-shadow:none} }
+  </style>
+</head>
+<body>
+  <div class=\"container\">
+    <header>
+      <h1>""" + title + """</h1>
+      <p>""" + beschrijving + """</p>
+    </header>
+    <main>
+"""
+                body_parts = []
+                if add_image_gallery and images:
+                    body_parts.append("<section><div class=\"grid\">")
+                    for rel in images:
+                        cap = rel
+                        body_parts.append(
+                            "<div class=\"tile\">" \
+                            + f"<a href=\"{rel}\" target=\"_blank\">" \
+                            + f"<img src=\"{rel}\" alt=\"{cap}\"></a>" \
+                            + f"<div class=\"cap\">{cap}</div>" \
+                            + "</div>"
+                        )
+                    body_parts.append("</div></section>")
+                else:
+                    body_parts.append("<p>Er zijn (nog) geen afbeeldingen of de galerij is uitgeschakeld.</p>")
+
+                tail = """
+    </main>
+    <footer>
+      <p>Automatisch gegenereerd door de Bingo-tool.</p>
+    </footer>
+  </div>
+</body>
+</html>
+"""
+                html_out = head + "\n".join(body_parts) + tail
+
+                # Schrijf bestand
+                with open(index_path, 'w', encoding='utf-8') as f:
+                    f.write(html_out)
+                if os.path.exists(index_path):
+                    if overwrite_existing:
+                        updated += 1
+                    else:
+                        created += 1
+
+            st.success(f"Klaar. Aangemaakt: {created}, Bijgewerkt: {updated}, Overgeslagen: {skipped}.")
+    except Exception as e:
+        st.error(f"Kon index.html bestanden niet genereren: {e}")
+
+# -----------------------------
+# Sync beschrijvingen.json met subfolders in 'stedenendorpen'
+# -----------------------------
+st.divider()
+st.subheader("🧭 Synchroniseer beschrijvingen.json met mappen")
+
+st.markdown("Houd beschrijvingen.json in sync met de submappen in 'stedenendorpen'. Ontbrekende plaatsen worden toegevoegd met de standaardtekst. Optioneel kun je entries verwijderen die geen corresponderende map meer hebben.")
+
+col1, col2 = st.columns([1,1])
+with col1:
+    do_add_missing = st.checkbox("Voeg ontbrekende plaatsen toe", value=True)
+with col2:
+    do_remove_orphans = st.checkbox("Verwijder entries zonder map", value=False)
+
+if st.button("Synchroniseer beschrijvingen.json"):
+    try:
+        steden_dir = os.path.join(BASE_DIR, 'stedenendorpen')
+        if not os.path.isdir(steden_dir):
+            st.error("Map 'stedenendorpen' niet gevonden naast bingo.py.")
+        else:
+            # Lees bestaande JSON
+            json_path = os.path.join(BASE_DIR, 'beschrijvingen.json')
+            data = {}
+            try:
+                if os.path.exists(json_path):
+                    import json
+                    with open(json_path, 'r', encoding='utf-8') as jf:
+                        loaded = json.load(jf)
+                        if isinstance(loaded, dict):
+                            data = loaded
+            except Exception:
+                data = {}
+
+            # Zorg voor default template
+            default_tpl = data.get('_default')
+            if not isinstance(default_tpl, str):
+                default_tpl = "Welkom! Dit is een korte pagina over {plaats}. Hieronder vind je een selectie afbeeldingen uit deze map."
+                data['_default'] = default_tpl
+
+            # Verzamel plaatsmappen (alleen eerste laag)
+            places_on_disk = [name for name in sorted(os.listdir(steden_dir)) if os.path.isdir(os.path.join(steden_dir, name))]
+
+            added = []
+            removed = []
+
+            # Voeg ontbrekende toe
+            if do_add_missing:
+                for name in places_on_disk:
+                    if name in data:
+                        continue
+                    plaatsnaam = name.replace('-', ' ').replace('_', ' ')
+                    desc = default_tpl.replace('{plaats}', plaatsnaam.title())
+                    data[name] = desc
+                    added.append(name)
+
+            # Verwijder entries zonder map
+            if do_remove_orphans:
+                known_keys = set(data.keys()) - {'_default'}
+                for key in sorted(known_keys):
+                    if key not in places_on_disk and key.title() not in places_on_disk and key.replace(' ', '-') not in places_on_disk:
+                        removed.append(key)
+                        del data[key]
+
+            # Schrijf terug
+            try:
+                import json
+                with open(json_path, 'w', encoding='utf-8') as jf:
+                    json.dump(data, jf, ensure_ascii=False, indent=2)
+                st.success(f"Synchronisatie klaar. Toegevoegd: {len(added)}, Verwijderd: {len(removed)}.")
+                if added:
+                    with st.expander("Toegevoegd"):
+                        for a in added:
+                            st.write(a)
+                if removed:
+                    with st.expander("Verwijderd"):
+                        for r in removed:
+                            st.write(r)
+            except Exception as e:
+                st.error(f"Kon beschrijvingen.json niet wegschrijven: {e}")
+    except Exception as e:
+        st.error(f"Kon synchronisatie niet uitvoeren: {e}")
+
+# -----------------------------
 # Beautify verhaal.html (wrap images, add CSS, captions)
 # -----------------------------
 st.divider()
@@ -613,6 +838,9 @@ if beauty_file is not None:
         st.info("De HTML is opgeschoond en opgemaakt. Afbeeldingen zijn gewrapt in figure-blokken met captions. Tekst is behouden.")
     except Exception as e:
         st.error(f"Kon verhaal.html niet beautify-en: {e}")
+
+
+
 
 
 

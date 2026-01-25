@@ -1,8 +1,18 @@
 {
   "_default": "Welkom! Dit is een korte pagina over {plaats}. Hieronder vind je een selectie afbeeldingen uit deze map.",
-  "Apeldoorn": "Apeldoorn staat bekend om Paleis Het Loo en de prachtige groene omgeving van de Veluwe.",
-  "Zwolle": "Zwolle is een historische Hanzestad met een sfeervol centrum en de bekende Peperbus.",
-  "Deventer": "Deventer is een van de oudste steden van Nederland, beroemd om de boekenmarkt en haar prachtige IJsselkade.",
-  "Kampen": "Kampen heeft een rijke maritieme geschiedenis en een karakteristieke historische binnenstad.",
-  "Hattem": "Hattem is een charmant stadje op de Veluwe met pittoreske straatjes en musea."
+  "01_ermelo": "Welkom! Dit is een korte pagina over 01 Ermelo. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "02_ijsselmuiden": "Welkom! Dit is een korte pagina over 02 Ijsselmuiden. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "03_echternach": "Welkom! Dit is een korte pagina over 03 Echternach. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "04_oudbeyerland": "Welkom! Dit is een korte pagina over 04 Oudbeyerland. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "05_pernis": "Welkom! Dit is een korte pagina over 05 Pernis. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "06_kampen": "Welkom! Dit is een korte pagina over 06 Kampen. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "07_herderwijk": "Welkom! Dit is een korte pagina over 07 Herderwijk. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "08_naaldwijk": "Welkom! Dit is een korte pagina over 08 Naaldwijk. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "09_eindhoven": "Welkom! Dit is een korte pagina over 09 Eindhoven. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "09_nuenen": "Welkom! Dit is een korte pagina over 09 Nuenen. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "10_veldhoven": "Welkom! Dit is een korte pagina over 10 Veldhoven. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "11_hoogvliet": "Welkom! Dit is een korte pagina over 11 Hoogvliet. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "12_utrecht": "Welkom! Dit is een korte pagina over 12 Utrecht. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "13_ede": "Welkom! Dit is een korte pagina over 13 Ede. Hieronder vind je een selectie afbeeldingen uit deze map.",
+  "14_rotterdam": "Welkom! Dit is een korte pagina over 14 Rotterdam. Hieronder vind je een selectie afbeeldingen uit deze map."
 }

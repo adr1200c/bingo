@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 from typing import List
+import json
 
 HTML_HEAD_TEMPLATE = """<!DOCTYPE html>
 <html lang=\"nl\">
@@ -56,10 +57,73 @@ def collect_images(place_dir: str) -> List[str]:
     images.sort()
     return images
 
-def build_html(place_name: str, images: List[str], with_gallery: bool) -> str:
+def load_descriptions(base_dir: str) -> dict:
+    path = os.path.join(base_dir, 'beschrijvingen.json')
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if isinstance(data, dict):
+                return data
+    except Exception:
+        pass
+    return {}
+
+def sync_descriptions(base_dir: str, steden_dir: str, remove_orphans: bool = False) -> tuple[int, int]:
+    """Synchronize beschrijvingen.json with folders under steden_dir.
+    Returns (added, removed)."""
+    path = os.path.join(base_dir, 'beschrijvingen.json')
+    # Load existing data
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if not isinstance(data, dict):
+                data = {}
+    except Exception:
+        data = {}
+
+    # Ensure default template
+    default_tpl = data.get('_default')
+    if not isinstance(default_tpl, str):
+        default_tpl = "Welkom! Dit is een korte pagina over {plaats}. Hieronder vind je een selectie afbeeldingen uit deze map."
+        data['_default'] = default_tpl
+
+    # Collect first-level folders
+    places_on_disk = [name for name in sorted(os.listdir(steden_dir)) if os.path.isdir(os.path.join(steden_dir, name))]
+
+    added = 0
+    removed = 0
+
+    # Add missing
+    for name in places_on_disk:
+        if name in data:
+            continue
+        plaatsnaam = name.replace('-', ' ').replace('_', ' ')
+        desc = default_tpl.replace('{plaats}', plaatsnaam.title())
+        data[name] = desc
+        added += 1
+
+    # Remove orphans
+    if remove_orphans:
+        keys = list(data.keys())
+        for key in keys:
+            if key == '_default':
+                continue
+            if key not in places_on_disk and key.title() not in places_on_disk and key.replace(' ', '-') not in places_on_disk:
+                del data[key]
+                removed += 1
+
+    # Write back
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+    return added, removed
+
+def build_html(place_name: str, images: List[str], with_gallery: bool, beschrijving: str | None = None) -> str:
     plaatsnaam = place_name.replace('-', ' ').replace('_', ' ')
+    if not beschrijving:
+        beschrijving = f"Welkom! Dit is een korte pagina over {plaatsnaam.title()}. Hieronder vind je een selectie afbeeldingen uit deze map."
+
     title = f"{plaatsnaam.title()} — Fotoverslag"
-    beschrijving = f"Welkom! Dit is een korte pagina over {plaatsnaam.title()}. Hieronder vind je een selectie afbeeldingen uit deze map."
 
     head = HTML_HEAD_TEMPLATE.format(title=title, beschrijving=beschrijving)
     body_parts: List[str] = []
@@ -86,6 +150,8 @@ def main(argv=None):
     parser.add_argument('--base', type=str, default=None, help="Basismap (standaard: map van dit script)")
     parser.add_argument('--overwrite', action='store_true', help="Overschrijf bestaande index.html")
     parser.add_argument('--no-gallery', action='store_true', help="Schakel de afbeeldingsgalerij uit")
+    parser.add_argument('--sync-descriptions', action='store_true', help='Synchroniseer beschrijvingen.json met mappen voor generatie')
+    parser.add_argument('--remove-orphans', action='store_true', help='Verwijder beschrijvingen zonder corresponderende map (gebruik met --sync-descriptions)')
     args = parser.parse_args(argv)
 
     base_dir = args.base if args.base else os.path.dirname(os.path.abspath(__file__))
@@ -94,6 +160,12 @@ def main(argv=None):
     if not os.path.isdir(steden_dir):
         print("FOUT: Map 'stedenendorpen' niet gevonden in", base_dir)
         return 2
+
+    if args.sync_descriptions:
+        added, removed = sync_descriptions(base_dir, steden_dir, remove_orphans=args.remove_orphans)
+        print(f"Synchronisatie beschrijvingen.json — Toegevoegd: {added}, Verwijderd: {removed}.")
+
+    descs = load_descriptions(base_dir)
 
     created = 0
     updated = 0
@@ -110,7 +182,15 @@ def main(argv=None):
             continue
 
         images = collect_images(place_path)
-        html_out = build_html(name, images, with_gallery=(not args.no_gallery))
+
+        plaatsnaam = name.replace('-', ' ').replace('_', ' ')
+        custom = descs.get(name) or descs.get(plaatsnaam) or descs.get(name.title())
+        if not custom:
+            default_tpl = descs.get('_default')
+            if isinstance(default_tpl, str):
+                custom = default_tpl.replace('{plaats}', plaatsnaam.title())
+
+        html_out = build_html(name, images, with_gallery=(not args.no_gallery), beschrijving=custom)
 
         os.makedirs(place_path, exist_ok=True)
         with open(index_path, 'w', encoding='utf-8') as f:
